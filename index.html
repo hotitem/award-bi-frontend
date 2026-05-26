@@ -2,28 +2,706 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>award.bi - K-Beauty Asset Inscription</title>
-  <style>
-    body {
-      margin: 0;
-      background: #0a0e27;
-      color: #fff;
-      font-family: -apple-system, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      text-align: center;
-    }
-    h1 { font-size: 4rem; margin: 0; }
-    p { color: #888; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>award.bi — Beauty Identity Award Global</title>
+  <meta name="description" content="K-Beauty 브랜드 자산을 비트코인에 영구 각인. W3C VC 표준 인증 · SBT · NFT 발행 플랫폼.">
+  <meta property="og:title" content="award.bi — Beauty Identity Award Global">
+  <meta property="og:description" content="비트코인에 당신의 브랜드를, 세계로 연결되다.">
+  <meta property="og:image" content="https://award.bi/assets/og.png">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%237c3aed'/><text y='22' x='5' font-size='18'>⭐</text></svg>">
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-  <div>
-    <h1>award.bi</h1>
-    <p>K-Beauty Asset Inscription System</p>
-    <p>Coming Soon</p>
+
+<!-- ═══════════════════════════════════════
+     HEADER
+     ═══════════════════════════════════════ -->
+<header class="header" id="header">
+  <div class="header-inner">
+    <a href="/" class="header-logo">
+      <div class="logo-icon">⭐</div>
+      award.bi
+    </a>
+
+    <nav class="header-nav">
+      <a href="#about"      class="nav-link">서비스 소개</a>
+      <a href="/brand/esco.html" class="nav-link">브랜드</a>
+      <a href="/verify.html" class="nav-link">인증 검색</a>
+      <a href="#categories" class="nav-link">NFT · SBT</a>
+      <a href="#journey"    class="nav-link">소개</a>
+      <a href="#partners"   class="nav-link">파트너</a>
+    </nav>
+
+    <div class="header-right">
+      <div class="btc-ticker" id="btcTicker">
+        <span class="dot"></span>
+        <span id="btcPrice">₿ 로딩 중…</span>
+      </div>
+      <a href="https://kei.bio/login" class="login-btn" target="_blank">
+        kei.bio 로그인
+      </a>
+      <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+    </div>
   </div>
+</header>
+
+<!-- ═══════════════════════════════════════
+     HERO
+     ═══════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <!-- Glow orbs -->
+  <div class="orb orb-purple" style="width:600px;height:600px;top:-200px;right:-100px;"></div>
+  <div class="orb orb-gold"   style="width:300px;height:300px;bottom:0;left:0;"></div>
+
+  <div class="hero-inner container">
+    <!-- Left: Text -->
+    <div class="hero-content">
+      <div class="hero-kicker">
+        <span class="dot"></span>
+        K-Beauty · Identity · Award · Bitcoin
+      </div>
+
+      <h1 class="hero-title">
+        <span class="line-1">BEAUTY IDENTITY</span>
+        <span class="line-2">AWARD</span>
+        <span class="line-3">Global Inscription Platform</span>
+      </h1>
+
+      <p class="hero-sub">
+        비트코인에 당신의 브랜드를, 세계로 연결되다.<br>
+        W3C 국제 표준 VC · SBT · NFT 발행으로<br>
+        K-Beauty 자산을 영구 인증하세요.
+      </p>
+
+      <div class="hero-cta">
+        <a href="https://kei.bio" class="btn btn-primary" target="_blank">
+          🚀 브랜드 등록하기
+        </a>
+        <a href="/verify.html" class="btn btn-outline">
+          🔍 인증 확인하기
+        </a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hero-stat-item">
+          <div class="hero-stat-num" id="statBrands">2,145+</div>
+          <div class="hero-stat-lbl">등록 브랜드</div>
+        </div>
+        <div class="hero-stat-item">
+          <div class="hero-stat-num" id="statVCs">6,782+</div>
+          <div class="hero-stat-lbl">VC 발행</div>
+        </div>
+        <div class="hero-stat-item">
+          <div class="hero-stat-num" id="statInscribed">24,687+</div>
+          <div class="hero-stat-lbl">글로벌 인증</div>
+        </div>
+        <div class="hero-stat-item">
+          <div class="hero-stat-num">42+</div>
+          <div class="hero-stat-lbl">파트너</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Visual -->
+    <div class="hero-visual">
+      <div class="hero-product-frame">
+        <div class="hero-product-bg"></div>
+
+        <!-- Floating: Real-time status -->
+        <div class="hero-float hero-float-status">
+          <div class="float-title">⚡ REAL TIME STATUS</div>
+          <div class="float-row">
+            <span class="float-key">VC 발행</span>
+            <span class="float-val" id="floatVC">12,458</span>
+          </div>
+          <div class="float-row">
+            <span class="float-key">배치</span>
+            <span class="float-val">38</span>
+          </div>
+          <div class="float-row">
+            <span class="float-key">확인</span>
+            <span class="float-val up">42 ✓</span>
+          </div>
+        </div>
+
+        <!-- Product art -->
+        <div class="hero-product-art">
+          <div class="hero-product-icon">🧴</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:16px;">
+            <span class="badge badge-green">✓ Kei 공식인증</span>
+            <span class="badge badge-purple">⭐ SBT 발행</span>
+          </div>
+          <div class="hero-product-name" style="margin-top:8px;">
+            ESCO B5 Cream<br>
+            <span style="font-size:11px;color:#475569;">by kei.bio/esco</span>
+          </div>
+        </div>
+
+        <!-- Floating: Bitcoin countdown -->
+        <div class="hero-float hero-float-btc">
+          <div class="float-title">⚓ 다음 Bitcoin 각인</div>
+          <div class="float-countdown" id="btcCountdown">--:--:--</div>
+          <div class="float-countdown-lbl">매일 자정 KST 배치 실행</div>
+          <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.07);">
+            <div class="float-row">
+              <span class="float-key">대기 중 VC</span>
+              <span class="float-val" id="pendingVC">247</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Verified badge -->
+        <div class="verified-overlay">
+          ✅ Bitcoin 각인 완료 · Block #895,412
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     LIVE TICKER
+     ═══════════════════════════════════════ -->
+<div class="ticker-bar">
+  <div class="ticker-inner" id="tickerInner">
+    <div class="ticker-item"><span class="brand-dot"></span> ESCO <span class="val">SBT 발행 완료</span></div>
+    <div class="ticker-item"><span class="brand-dot"></span> K-LAB <span class="val">정품인증 500개 발행</span></div>
+    <div class="ticker-item"><span class="brand-dot"></span> Bitcoin Block <span class="val">#895,412 각인</span></div>
+    <div class="ticker-item"><span class="brand-dot"></span> 오늘 VC 발행 <span class="val">247건</span></div>
+    <div class="ticker-item"><span class="brand-dot"></span> AMOREPACIFIC <span class="val">수출면장 SBT</span></div>
+    <div class="ticker-item"><span class="brand-dot"></span> W3C VC 인증 <span class="val">Ed25519 서명</span></div>
+    <div class="ticker-item"><span class="brand-dot"></span> OpenTimestamps <span class="val">공증 완료</span></div>
+    <!-- duplicate for infinite loop -->
+    <div class="ticker-item"><span class="brand-dot"></span> ESCO <span class="val">SBT 발행 완료</span></div>
+    <div class="ticker-item"><span class="brand-dot"></span> K-LAB <span class="val">정품인증 500개 발행</span></div>
+    <div class="ticker-item"><span class="brand-dot"></span> Bitcoin Block <span class="val">#895,412 각인</span></div>
+    <div class="ticker-item"><span class="brand-dot"></span> 오늘 VC 발행 <span class="val">247건</span></div>
+    <div class="ticker-item"><span class="brand-dot"></span> AMOREPACIFIC <span class="val">수출면장 SBT</span></div>
+    <div class="ticker-item"><span class="brand-dot"></span> W3C VC 인증 <span class="val">Ed25519 서명</span></div>
+    <div class="ticker-item"><span class="brand-dot"></span> OpenTimestamps <span class="val">공증 완료</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ACTIVITY MAP
+     ═══════════════════════════════════════ -->
+<section class="activity-section section" id="activity">
+  <div class="container">
+    <div class="activity-grid">
+      <!-- World map -->
+      <div>
+        <div class="section-tag" style="margin-bottom:16px;">🌍 GLOBAL ACTIVITY MAP</div>
+        <h2 style="font-size:26px;font-weight:800;margin-bottom:24px;">
+          실시간 글로벌 인증 현황
+        </h2>
+        <div class="map-container">
+          <div class="map-bg"></div>
+          <!-- Simplified world map SVG -->
+          <svg class="map-svg" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;">
+            <!-- Continents simplified shapes -->
+            <path d="M80,120 L200,100 L220,160 L180,200 L100,180 Z" fill="rgba(124,58,237,0.08)" stroke="rgba(124,58,237,0.2)" stroke-width="1"/>
+            <path d="M220,80 L380,60 L420,120 L400,200 L300,220 L240,160 Z" fill="rgba(59,130,246,0.08)" stroke="rgba(59,130,246,0.2)" stroke-width="1"/>
+            <path d="M440,60 L580,80 L600,180 L560,220 L480,200 L440,140 Z" fill="rgba(16,185,129,0.08)" stroke="rgba(16,185,129,0.2)" stroke-width="1"/>
+            <path d="M580,100 L700,80 L720,160 L680,200 L600,180 Z" fill="rgba(124,58,237,0.08)" stroke="rgba(124,58,237,0.2)" stroke-width="1"/>
+            <path d="M120,220 L200,240 L200,340 L140,320 L80,280 Z" fill="rgba(245,158,11,0.06)" stroke="rgba(245,158,11,0.15)" stroke-width="1"/>
+            <path d="M260,240 L340,260 L320,360 L260,340 Z" fill="rgba(236,72,153,0.06)" stroke="rgba(236,72,153,0.15)" stroke-width="1"/>
+            <path d="M460,240 L560,220 L580,320 L520,340 L460,300 Z" fill="rgba(16,185,129,0.06)" stroke="rgba(16,185,129,0.15)" stroke-width="1"/>
+          </svg>
+          <!-- Activity dots -->
+          <div class="map-pulse pulse-1" title="서울 · ESCO SBT 발행"></div>
+          <div class="map-pulse pulse-2" title="도쿄 · K-Beauty 인증"></div>
+          <div class="map-pulse pulse-3" title="상하이 · 정품인증 NFT"></div>
+          <div class="map-pulse pulse-4" title="뉴욕 · Bitcoin 각인"></div>
+          <div class="map-pulse pulse-5" title="파리 · VC 검증"></div>
+
+          <!-- Activity count overlay -->
+          <div style="position:absolute;bottom:16px;left:16px;right:16px;display:flex;gap:12px;">
+            <div style="padding:8px 14px;background:rgba(20,25,41,0.85);backdrop-filter:blur(8px);border:1px solid rgba(124,58,237,0.3);border-radius:8px;text-align:center;">
+              <div style="font-size:18px;font-weight:800;color:#a78bfa;">8,241</div>
+              <div style="font-size:10px;color:#64748b;">서울</div>
+            </div>
+            <div style="padding:8px 14px;background:rgba(20,25,41,0.85);backdrop-filter:blur(8px);border:1px solid rgba(16,185,129,0.3);border-radius:8px;text-align:center;">
+              <div style="font-size:18px;font-weight:800;color:#34d399;">2,165</div>
+              <div style="font-size:10px;color:#64748b;">글로벌</div>
+            </div>
+            <div style="padding:8px 14px;background:rgba(20,25,41,0.85);backdrop-filter:blur(8px);border:1px solid rgba(245,158,11,0.3);border-radius:8px;text-align:center;">
+              <div style="font-size:18px;font-weight:800;color:#fcd34d;">1,88</div>
+              <div style="font-size:10px;color:#64748b;">파트너</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trending brands -->
+      <div>
+        <div class="section-tag" style="margin-bottom:16px;">🔥 TRENDING</div>
+        <h2 style="font-size:26px;font-weight:800;margin-bottom:24px;">인기 브랜드</h2>
+        <div class="trending-card">
+          <div class="trending-item">
+            <div class="trending-rank top">1</div>
+            <div class="trending-logo" style="background:linear-gradient(135deg,#7c3aed,#4f46e5);">🧴</div>
+            <div class="trending-info">
+              <div class="trending-name">ESCO</div>
+              <div class="trending-sub">SBT 7건 · NFT 1,000개</div>
+            </div>
+            <div class="trending-change">+12.4%</div>
+          </div>
+          <div class="trending-item">
+            <div class="trending-rank top">2</div>
+            <div class="trending-logo" style="background:linear-gradient(135deg,#0ea5e9,#6366f1);">💄</div>
+            <div class="trending-info">
+              <div class="trending-name">K-LAB Beauty</div>
+              <div class="trending-sub">SBT 3건 · NFT 500개</div>
+            </div>
+            <div class="trending-change">+8.7%</div>
+          </div>
+          <div class="trending-item">
+            <div class="trending-rank top">3</div>
+            <div class="trending-logo" style="background:linear-gradient(135deg,#10b981,#0d9488);">🌿</div>
+            <div class="trending-info">
+              <div class="trending-name">Jeju Lab</div>
+              <div class="trending-sub">SBT 5건 · NFT 300개</div>
+            </div>
+            <div class="trending-change">+6.2%</div>
+          </div>
+          <div class="trending-item">
+            <div class="trending-rank">4</div>
+            <div class="trending-logo" style="background:linear-gradient(135deg,#f59e0b,#d97706);">✨</div>
+            <div class="trending-info">
+              <div class="trending-name">Allure Korea</div>
+              <div class="trending-sub">SBT 2건 · NFT 200개</div>
+            </div>
+            <div class="trending-change">+4.1%</div>
+          </div>
+          <div class="trending-item">
+            <div class="trending-rank">5</div>
+            <div class="trending-logo" style="background:linear-gradient(135deg,#ec4899,#be185d);">🌸</div>
+            <div class="trending-info">
+              <div class="trending-name">Blossom Co.</div>
+              <div class="trending-sub">SBT 4건 · NFT 150개</div>
+            </div>
+            <div class="trending-change">+3.8%</div>
+          </div>
+
+          <!-- Quick verify CTA -->
+          <div style="margin-top:8px;padding:16px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);border-radius:12px;text-align:center;">
+            <div style="font-size:13px;color:#a78bfa;font-weight:600;margin-bottom:8px;">내 브랜드 인증 현황 확인</div>
+            <a href="https://kei.bio" class="btn btn-primary btn-sm" target="_blank">kei.bio에서 등록하기 →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     AWARD CATEGORIES
+     ═══════════════════════════════════════ -->
+<section class="section" id="categories" style="background:var(--bg-1);">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">⭐ 2025 AWARD CATEGORIES</div>
+      <h2 class="section-title">자산 인증 카테고리</h2>
+      <p class="section-sub">W3C 국제 표준을 기반으로 6가지 자산 유형을 비트코인에 영구 각인합니다</p>
+    </div>
+
+    <div class="categories-grid">
+      <div class="card cat-card card-glow-purple">
+        <div class="cat-icon cat-icon-purple">🏷️</div>
+        <div class="cat-title">브랜드 디자인 SBT</div>
+        <div class="cat-desc">로고·상표·제품 디자인을 Soulbound Token으로 영구 선언. 양도 불가, 브랜드 정체성 그 자체.</div>
+        <div class="cat-count" style="background:var(--grad-purple);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">3,241</div>
+        <div class="cat-count-label">발행된 SBT</div>
+        <div class="cat-arrow">↗</div>
+      </div>
+
+      <div class="card cat-card card-glow-gold">
+        <div class="cat-icon cat-icon-gold">🎖️</div>
+        <div class="cat-title">정품인증 NFT</div>
+        <div class="cat-desc">기업이 N개 수량 한정으로 정품인증서 NFT를 발행. 소비자 구매·리뷰 완료 시 자동 지급.</div>
+        <div class="cat-count" style="color:var(--gold-l);">18,492</div>
+        <div class="cat-count-label">발행된 NFT</div>
+        <div class="cat-arrow">↗</div>
+      </div>
+
+      <div class="card cat-card card-glow-green">
+        <div class="cat-icon cat-icon-green">👤</div>
+        <div class="cat-title">모델 · AI 인증 SBT</div>
+        <div class="cat-desc">브랜드 모델·AI 생성 이미지의 원작자 권리를 SBT로 선언. 저작권 분쟁 사전 방지.</div>
+        <div class="cat-count" style="color:var(--green-l);">892</div>
+        <div class="cat-count-label">발행된 SBT</div>
+        <div class="cat-arrow">↗</div>
+      </div>
+
+      <div class="card cat-card card-glow-purple">
+        <div class="cat-icon cat-icon-blue">📜</div>
+        <div class="cat-title">수출면장 · 계약 SBT</div>
+        <div class="cat-desc">수출면장, 계약서, 공증 서류를 W3C VC로 발행 후 Bitcoin에 각인. 글로벌 무역 증명.</div>
+        <div class="cat-count" style="color:#93c5fd;">247</div>
+        <div class="cat-count-label">발행된 VC</div>
+        <div class="cat-arrow">↗</div>
+      </div>
+
+      <div class="card cat-card card-glow-gold">
+        <div class="cat-icon cat-icon-pink">💎</div>
+        <div class="cat-title">멤버십 NFT</div>
+        <div class="cat-desc">브랜드 VIP 멤버십 권리를 NFT로 발행. 포인트로 구매하거나 후원 상품 수령 시 지급.</div>
+        <div class="cat-count" style="color:#f9a8d4;">1,089</div>
+        <div class="cat-count-label">발행된 NFT</div>
+        <div class="cat-arrow">↗</div>
+      </div>
+
+      <div class="card cat-card" style="background:linear-gradient(145deg,rgba(245,158,11,0.08),var(--bg-card));border-color:rgba(245,158,11,0.2);">
+        <div class="cat-icon cat-icon-gold">⚓</div>
+        <div class="cat-title">Bitcoin 각인 현황</div>
+        <div class="cat-desc">모든 자산 활동은 매일 자정 1회 비트코인 머클 트리로 영구 각인됩니다. OpenTimestamps 사용.</div>
+        <div style="display:flex;gap:16px;margin-top:8px;">
+          <div>
+            <div class="cat-count" style="color:var(--gold-l);font-size:18px;">895,412</div>
+            <div class="cat-count-label">최신 블록</div>
+          </div>
+          <div>
+            <div class="cat-count" style="color:var(--green-l);font-size:18px;">38</div>
+            <div class="cat-count-label">총 배치</div>
+          </div>
+        </div>
+        <div class="cat-arrow">↗</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     FEATURED BRAND (ESCO)
+     ═══════════════════════════════════════ -->
+<section class="section" id="featured">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">✨ FEATURED BRAND</div>
+      <h2 class="section-title">인증 브랜드 <span>쇼케이스</span></h2>
+      <p class="section-sub">award.bi 아뜰리에가 인증한 K-Beauty 브랜드의 자산을 확인하세요</p>
+    </div>
+
+    <!-- ESCO Brand Card -->
+    <div style="background:var(--bg-card);border:1px solid var(--border-2);border-radius:var(--radius-xl);overflow:hidden;margin-bottom:48px;">
+      <div style="padding:32px;display:flex;align-items:center;gap:24px;border-bottom:1px solid var(--border);">
+        <div style="width:72px;height:72px;border-radius:16px;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:36px;box-shadow:0 0 30px rgba(124,58,237,0.3);">🧴</div>
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <h3 style="font-size:24px;font-weight:900;">ESCO</h3>
+            <span class="badge badge-green">✓ Kei 공식인증</span>
+            <span class="badge badge-purple">⭐ award.bi 아뜰리에</span>
+          </div>
+          <p style="font-size:14px;color:var(--text-3);">escobeauty.co.kr · K-Beauty 스킨케어 브랜드 · 제주 감귤 성분 특화</p>
+        </div>
+        <div style="display:flex;gap:24px;">
+          <div style="text-align:center;">
+            <div style="font-size:22px;font-weight:800;color:#a78bfa;">7</div>
+            <div style="font-size:11px;color:var(--text-3);">SBT</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:22px;font-weight:800;color:#fcd34d;">1,000</div>
+            <div style="font-size:11px;color:var(--text-3);">NFT</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:22px;font-weight:800;color:#34d399;">38</div>
+            <div style="font-size:11px;color:var(--text-3);">각인</div>
+          </div>
+        </div>
+        <a href="/brand/esco.html" class="btn btn-primary btn-sm">전체 보기 →</a>
+      </div>
+
+      <!-- Asset mini grid -->
+      <div style="padding:24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;">
+        <!-- Asset 1 -->
+        <div class="asset-card">
+          <div class="asset-card-img" style="aspect-ratio:1;">
+            <div class="asset-img-bg" style="background:linear-gradient(145deg,#3d2600,#7c5a00);"></div>
+            <div class="asset-img-content">🍊</div>
+            <div class="asset-type-badge"><span class="tag tag-design">상품 디자인</span></div>
+            <div class="asset-chain-badge">
+              <div class="asset-sbt-tag">⭐ SBT</div>
+              <a href="#" class="opensea-link">OpenSea ↗</a>
+            </div>
+          </div>
+          <div class="asset-card-body">
+            <div class="asset-card-name">Jeju Tangerine Cream</div>
+            <div class="asset-card-actions">
+              <a href="/verify.html?id=vc-esco-001" class="btn btn-outline btn-sm">🔍 SBT 보기</a>
+            </div>
+          </div>
+        </div>
+        <!-- Asset 2 -->
+        <div class="asset-card">
+          <div class="asset-card-img" style="aspect-ratio:1;">
+            <div class="asset-img-bg" style="background:linear-gradient(145deg,#1a0a2e,#2d1060);"></div>
+            <div class="asset-img-content">👩</div>
+            <div class="asset-type-badge"><span class="tag tag-model">모델 · AI</span></div>
+            <div class="asset-verified-badge">✓ Kei 공식인증</div>
+            <div class="asset-chain-badge">
+              <div class="asset-sbt-tag">⭐ SBT</div>
+              <a href="#" class="opensea-link">OpenSea ↗</a>
+            </div>
+          </div>
+          <div class="asset-card-body">
+            <div class="asset-card-name">Elin — AI Model</div>
+            <div class="asset-card-actions">
+              <span class="badge badge-green" style="font-size:11px;">✓ 공식인증</span>
+              <a href="/verify.html?id=vc-esco-002" class="btn btn-outline btn-sm">🔍 SBT</a>
+            </div>
+          </div>
+        </div>
+        <!-- Asset 3 -->
+        <div class="asset-card">
+          <div class="asset-card-img" style="aspect-ratio:1;">
+            <div class="asset-img-bg" style="background:linear-gradient(145deg,#001a35,#003070);"></div>
+            <div class="asset-img-content">💙</div>
+            <div class="asset-type-badge"><span class="tag tag-design">상품 디자인</span></div>
+            <div class="asset-verified-badge">✓ Kei 공식인증</div>
+            <div class="asset-chain-badge">
+              <div class="asset-sbt-tag">⭐ SBT</div>
+              <a href="#" class="opensea-link">OpenSea ↗</a>
+            </div>
+          </div>
+          <div class="asset-card-body">
+            <div class="asset-card-name">B5 Barrier Cream</div>
+            <div class="asset-card-actions">
+              <span class="badge badge-green" style="font-size:11px;">✓ 공식인증</span>
+              <a href="/verify.html?id=vc-esco-003" class="btn btn-outline btn-sm">🔍 SBT</a>
+            </div>
+          </div>
+        </div>
+        <!-- Asset 4 — 로그인 필요 -->
+        <div class="asset-card">
+          <div class="asset-card-img" style="aspect-ratio:1;position:relative;">
+            <div class="asset-img-bg" style="background:linear-gradient(145deg,#0f172a,#1e293b);filter:blur(4px);"></div>
+            <div class="lock-overlay">
+              <div class="lock-icon">🔒</div>
+              <div class="lock-title">명함 이미지 잠금</div>
+              <div class="lock-sub">맞팔 회원만 열람 가능<br>로그인 후 요청 가능</div>
+              <a href="https://kei.bio/login" class="btn btn-primary btn-sm" target="_blank">로그인 →</a>
+            </div>
+          </div>
+          <div class="asset-card-body">
+            <div class="asset-card-name" style="color:var(--text-4);">로고 · 명함</div>
+            <div class="asset-card-actions">
+              <span class="badge badge-gray">🔒 잠금</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding:0 24px 24px;text-align:center;">
+        <a href="/brand/esco.html" class="btn btn-outline">
+          ESCO 전체 자산 보기 (7개 SBT · 1,000개 NFT) →
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     AWARD JOURNEY
+     ═══════════════════════════════════════ -->
+<section class="section journey-section" id="journey">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">🗺️ AWARD JOURNEY</div>
+      <h2 class="section-title">인증 <span>5단계 여정</span></h2>
+      <p class="section-sub">kei.bio 가입부터 Bitcoin 영구 각인까지, 단계별로 자산을 인증하세요</p>
+    </div>
+
+    <div class="journey-steps">
+      <div class="journey-step">
+        <div class="step-num">🔑</div>
+        <div class="step-label">1. kei.bio 가입</div>
+        <div class="step-sub">AWS SES 이메일 인증<br>Privy 지갑 연결</div>
+      </div>
+      <div class="journey-step">
+        <div class="step-num">📁</div>
+        <div class="step-label">2. 자산 등록</div>
+        <div class="step-sub">이미지·영상·디자인<br>Cloudflare R2 업로드</div>
+      </div>
+      <div class="journey-step">
+        <div class="step-num">⭐</div>
+        <div class="step-label">3. 아뜰리에 승인</div>
+        <div class="step-sub">award.bi 전문 검토팀<br>진위·저작권 확인</div>
+      </div>
+      <div class="journey-step">
+        <div class="step-num">📜</div>
+        <div class="step-label">4. W3C VC 발행</div>
+        <div class="step-sub">국제 표준 인증서<br>Ed25519 서명</div>
+      </div>
+      <div class="journey-step">
+        <div class="step-num">⚓</div>
+        <div class="step-label">5. Bitcoin 각인</div>
+        <div class="step-sub">매일 자정 머클 트리<br>OpenTimestamps 영구 증명</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     PAST WINNERS
+     ═══════════════════════════════════════ -->
+<section class="section" id="winners">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">🏆 PAST WINNERS</div>
+      <h2 class="section-title">역대 <span>수상 브랜드</span></h2>
+    </div>
+    <div class="winners-grid">
+      <div class="card winner-card card-glow-gold">
+        <div class="winner-trophy">🥇</div>
+        <div class="winner-year">2025 · 상품 디자인 부문</div>
+        <div class="winner-brand">ESCO Beauty</div>
+        <div class="winner-cat">Jeju Tangerine Series</div>
+      </div>
+      <div class="card winner-card card-glow-purple">
+        <div class="winner-trophy">🥇</div>
+        <div class="winner-year">2025 · 모델 AI 부문</div>
+        <div class="winner-brand">K-LAB</div>
+        <div class="winner-cat">AI Model Certification</div>
+      </div>
+      <div class="card winner-card card-glow-green">
+        <div class="winner-trophy">🥇</div>
+        <div class="winner-year">2025 · 수출 부문</div>
+        <div class="winner-brand">Jeju Lab</div>
+        <div class="winner-cat">Export Certificate SBT</div>
+      </div>
+      <div class="card winner-card">
+        <div class="winner-trophy">🥈</div>
+        <div class="winner-year">2025 · 정품인증 부문</div>
+        <div class="winner-brand">Blossom Co.</div>
+        <div class="winner-cat">10,000 NFT Authenticity</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     PARTNERS
+     ═══════════════════════════════════════ -->
+<section class="section-sm" id="partners" style="background:var(--bg-1);">
+  <div class="container">
+    <div class="section-header" style="margin-bottom:40px;">
+      <div class="section-tag">🤝 PARTNERS &amp; MEDIA</div>
+      <h2 class="section-title" style="font-size:28px;">신뢰받는 파트너</h2>
+    </div>
+    <div class="partners-row">
+      <div class="partner-logo" title="W3C — Verifiable Credentials">
+        <div class="partner-logo-icon" style="background:#005a9c;border-radius:4px;">W</div>
+        <div class="partner-logo-name" style="color:#005a9c;">W3C</div>
+      </div>
+      <div class="partner-logo" title="OpenTimestamps — Bitcoin Anchoring">
+        <div class="partner-logo-icon">🕐</div>
+        <div class="partner-logo-name">OpenTimestamps</div>
+      </div>
+      <div class="partner-logo" title="OpenSea — NFT Marketplace">
+        <div class="partner-logo-icon" style="background:#2081e2;border-radius:50%;">🌊</div>
+        <div class="partner-logo-name" style="color:#2081e2;">OpenSea</div>
+      </div>
+      <div class="partner-logo" title="coinbase">
+        <div class="partner-logo-icon" style="background:#0052ff;border-radius:50%;">₿</div>
+        <div class="partner-logo-name" style="color:#0052ff;">coinbase</div>
+      </div>
+      <div class="partner-logo" title="Forbes Korea">
+        <div class="partner-logo-icon">📰</div>
+        <div class="partner-logo-name">Forbes</div>
+      </div>
+      <div class="partner-logo" title="allure Korea">
+        <div class="partner-logo-icon">✨</div>
+        <div class="partner-logo-name" style="font-style:italic;">allure</div>
+      </div>
+      <div class="partner-logo" title="Cosmopolitan Korea">
+        <div class="partner-logo-icon">💋</div>
+        <div class="partner-logo-name">cosmopolitan</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     CTA BANNER
+     ═══════════════════════════════════════ -->
+<section class="section-sm" style="background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(14,165,233,0.1));">
+  <div class="container" style="text-align:center;">
+    <div style="font-size:14px;color:var(--purple-l);font-weight:700;letter-spacing:0.08em;margin-bottom:16px;text-transform:uppercase;">🚀 지금 시작하세요</div>
+    <h2 style="font-size:clamp(24px,4vw,40px);font-weight:900;margin-bottom:16px;">
+      당신의 브랜드를<br>
+      <span style="background:var(--grad-hero);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">비트코인에 영구 각인</span>하세요
+    </h2>
+    <p style="font-size:16px;color:var(--text-3);margin-bottom:32px;">kei.bio 계정으로 5분 안에 시작할 수 있습니다</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="https://kei.bio" class="btn btn-primary" target="_blank">🔑 kei.bio로 시작하기</a>
+      <a href="/verify.html" class="btn btn-outline">🔍 인증서 검색하기</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     FOOTER
+     ═══════════════════════════════════════ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">
+          <div class="logo-icon" style="width:28px;height:28px;border-radius:6px;background:var(--grad-purple);display:flex;align-items:center;justify-content:center;font-size:14px;">⭐</div>
+          award.bi
+        </div>
+        <p class="footer-desc">
+          award.bi는 kei.bio 포인트 자산 인증 플랫폼입니다.<br>
+          W3C VC · SBT · NFT · Bitcoin 각인으로<br>
+          K-Beauty 브랜드 자산을 영구 인증합니다.
+        </p>
+        <div style="margin-top:20px;display:flex;gap:8px;">
+          <span class="badge badge-green">⚓ Bitcoin 각인</span>
+          <span class="badge badge-purple">📜 W3C VC</span>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">서비스</div>
+        <div class="footer-links">
+          <a href="#about"       class="footer-link">서비스 소개</a>
+          <a href="/brand/esco.html" class="footer-link">브랜드 탐색</a>
+          <a href="/verify.html" class="footer-link">인증서 검색</a>
+          <a href="#categories"  class="footer-link">NFT · SBT</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">기술</div>
+        <div class="footer-links">
+          <a href="#" class="footer-link">W3C VC 표준</a>
+          <a href="#" class="footer-link">Bitcoin 각인</a>
+          <a href="#" class="footer-link">OpenTimestamps</a>
+          <a href="#" class="footer-link">API 문서</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">링크</div>
+        <div class="footer-links">
+          <a href="https://kei.bio"     class="footer-link" target="_blank">kei.bio ↗</a>
+          <a href="https://api.kei.bio" class="footer-link" target="_blank">api.kei.bio ↗</a>
+          <a href="#"                   class="footer-link">공지사항</a>
+          <a href="#"                   class="footer-link">Forum</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>© 2025 award.bi · Powered by kei.bio · Bitcoin OpenTimestamps</div>
+      <div class="footer-badges">
+        <span class="badge badge-gold">⚓ Bitcoin</span>
+        <span class="badge badge-purple">📜 W3C VC</span>
+        <span class="badge badge-green">✓ 인증됨</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
 </body>
 </html>

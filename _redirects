@@ -1,0 +1,7 @@
+# Cloudflare Pages Redirects
+# award.bi routing
+
+/brand           /brand/esco.html   302
+/esco            /brand/esco.html   301
+/verify          /verify.html       301
+/v/:id           /verify.html?id=:id 301
