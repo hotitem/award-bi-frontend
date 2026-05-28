@@ -374,6 +374,7 @@ function buildCard(d) {
   const meta = d.asset_metadata || {};
   const title = meta.title || meta.asset_name || d.asset_class || '(무제)';
   const brand = d.brand_name || d.kei_bio_brand_slug || '—';
+  const slug  = d.kei_bio_brand_slug || meta.brand_slug || '';
   const emoji = ASSET_EMOJIS[d.asset_class] || '📁';
   const classLabel = ASSET_CLASS_LABELS[d.asset_class] || d.asset_class;
   const date = d.declared_at ? new Date(d.declared_at).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }) : '—';
@@ -392,22 +393,34 @@ function buildCard(d) {
     ? `<button class="btn btn-sm" style="background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);color:#f87171;" onclick="toggleReject('${d.declaration_id}')">✕ 거절</button>`
     : '';
 
-  const thumbSrc = d.source_url
-    ? `<img src="${d.source_url}" alt="" loading="lazy" onerror="this.parentElement.textContent='${emoji}'">`
-    : emoji;
+  // 영상(mp4/webm/mov) 여부 판별
+  const isVideo = d.source_url && /\.(mp4|webm|mov)(\?|$)/i.test(d.source_url);
+  let thumbSrc;
+  if (!d.source_url) {
+    thumbSrc = emoji;
+  } else if (isVideo) {
+    thumbSrc = `<video src="${d.source_url}" muted preload="metadata" style="width:100%;height:100%;object-fit:cover;border-radius:6px;" onerror="this.parentElement.innerHTML='🎬'"></video>`;
+  } else {
+    thumbSrc = `<img src="${d.source_url}" alt="" loading="lazy" crossorigin="anonymous" onerror="this.parentElement.textContent='${emoji}'">`;
+  }
+
+  const keiLink = slug
+    ? `<a href="https://kei.bio/${slug}" target="_blank" style="color:var(--purple-l);font-size:11px;text-decoration:none;">🔗 kei.bio/${slug}</a>`
+    : '';
 
   return `
 <div class="decl-card status-${d.status}" id="card-${d.declaration_id}">
   <div class="decl-header" data-id="${d.declaration_id}">
     <div class="asset-thumb">${thumbSrc}</div>
     <div class="decl-meta">
-      <div class="decl-title">${title}</div>
+      <div class="decl-title">${title} ${keiLink}</div>
       <div class="decl-sub">
         <span>${statusBadge}</span>
         <span style="color:var(--text-3);">🏷️ ${classLabel}</span>
         <span>👤 ${brand}</span>
         <span>🕐 ${date}</span>
         ${d.token_category ? `<span class="badge badge-purple" style="font-size:10px;">${d.token_category}</span>` : ''}
+        ${isVideo ? '<span class="badge" style="background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:#93c5fd;font-size:10px;">🎬 영상</span>' : ''}
       </div>
     </div>
     <div class="decl-actions">
