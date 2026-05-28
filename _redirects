@@ -1,9 +1,9 @@
 # Cloudflare Pages Redirects
 # award.bi routing
+# NOTE: Do NOT redirect to .html URLs — Cloudflare Pages auto-redirects .html→pretty,
+# which creates an infinite loop (/atelier → /atelier.html → /atelier → ...)
 
-/brand           /brand/esco.html   302
-/esco            /brand/esco.html   301
-/verify          /verify.html       301
-/v/:id           /verify.html?id=:id 301
-/atelier         /atelier.html      301
-/admin           /atelier.html      301
+/brand           /brand/esco        302
+/esco            /brand/esco        301
+/v/:id           /verify?id=:id     301
+/admin           /atelier           301
