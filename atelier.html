@@ -401,7 +401,7 @@ function buildCard(d) {
   } else if (isVideo) {
     thumbSrc = `<video src="${d.source_url}" muted preload="metadata" style="width:100%;height:100%;object-fit:cover;border-radius:6px;" onerror="this.parentElement.innerHTML='🎬'"></video>`;
   } else {
-    thumbSrc = `<img src="${d.source_url}" alt="" loading="lazy" crossorigin="anonymous" onerror="this.parentElement.textContent='${emoji}'">`;
+    thumbSrc = `<img src="${d.source_url}" alt="" loading="lazy" onerror="this.parentElement.textContent='${emoji}'">`;
   }
 
   const keiLink = slug
