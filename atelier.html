@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>아뜰리에 대시보드 — award.bi</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%237c3aed'/><text y='22' x='5' font-size='18'>⭐</text></svg>">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .atelier-wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+    /* ── Login ── */
+    .login-card {
+      max-width: 480px; margin: 80px auto; padding: 40px;
+      background: var(--bg-card); border: 1px solid var(--border-2);
+      border-radius: var(--radius-xl);
+    }
+    .login-card h2 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+    .login-card p  { font-size: 14px; color: var(--text-3); margin-bottom: 28px; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-3); margin-bottom: 6px; }
+    .form-input {
+      width: 100%; padding: 10px 14px; background: var(--bg-1);
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      color: var(--text-1); font-size: 14px; font-family: inherit;
+      box-sizing: border-box;
+    }
+    .form-input:focus { outline: none; border-color: var(--purple); }
+    .login-error { color: #f87171; font-size: 13px; margin-top: 10px; display: none; }
+
+    /* ── Top bar ── */
+    .atelier-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 0; border-bottom: 1px solid var(--border); margin-bottom: 28px;
+    }
+    .atelier-topbar .user-info { font-size: 13px; color: var(--text-3); }
+    .atelier-topbar .user-info strong { color: var(--text-1); }
+
+    /* ── Stats row ── */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
+    .stat-card {
+      padding: 18px 20px; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+    }
+    .stat-card .val { font-size: 28px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
+    .stat-card .lbl { font-size: 12px; color: var(--text-4); }
+
+    /* ── Filter tabs ── */
+    .tab-row { display: flex; gap: 8px; margin-bottom: 20px; }
+    .tab-btn {
+      padding: 6px 16px; border-radius: 100px;
+      background: var(--bg-1); border: 1px solid var(--border);
+      color: var(--text-3); font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+    .tab-btn.active {
+      background: rgba(124,58,237,0.15); border-color: rgba(124,58,237,0.4);
+      color: var(--purple-l);
+    }
+
+    /* ── Declaration cards ── */
+    .decl-list { display: flex; flex-direction: column; gap: 14px; }
+    .decl-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-md); overflow: hidden;
+    }
+    .decl-card.status-pending  { border-left: 3px solid #f59e0b; }
+    .decl-card.status-approved { border-left: 3px solid #34d399; }
+    .decl-card.status-failed   { border-left: 3px solid #f87171; }
+
+    .decl-header {
+      display: flex; align-items: center; gap: 14px;
+      padding: 18px 20px; cursor: pointer;
+    }
+    .decl-meta { flex: 1; min-width: 0; }
+    .decl-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .decl-sub { font-size: 12px; color: var(--text-3); display: flex; gap: 12px; flex-wrap: wrap; }
+    .decl-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+    .decl-detail {
+      padding: 0 20px 18px;
+      border-top: 1px solid var(--border); display: none;
+    }
+    .decl-detail.open { display: block; }
+    .detail-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+      font-size: 13px; margin-top: 14px;
+    }
+    .detail-row { display: flex; flex-direction: column; gap: 3px; }
+    .detail-key { font-size: 11px; color: var(--text-4); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+    .detail-val { color: var(--text-1); font-family: monospace; font-size: 12px; word-break: break-all; }
+
+    .reject-form { margin-top: 14px; display: none; }
+    .reject-form.open { display: block; }
+    .reject-form textarea {
+      width: 100%; padding: 10px 14px; background: var(--bg-0);
+      border: 1px solid rgba(248,113,113,0.3); border-radius: var(--radius-sm);
+      color: var(--text-1); font-size: 13px; resize: vertical; min-height: 60px;
+      font-family: inherit; box-sizing: border-box;
+    }
+
+    /* ── Source image preview ── */
+    .asset-thumb {
+      width: 56px; height: 56px; border-radius: 10px;
+      background: var(--bg-1); overflow: hidden; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 24px;
+    }
+    .asset-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* ── Empty / loading ── */
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-4); }
+    .empty-state .icon { font-size: 48px; margin-bottom: 14px; opacity: 0.4; }
+    .loading-dots::after {
+      content: ''; animation: dots 1.2s infinite;
+    }
+    @keyframes dots {
+      0%  { content: ''; }
+      33% { content: '.'; }
+      66% { content: '..'; }
+      100%{ content: '...'; }
+    }
+
+    /* ── Toast ── */
+    .toast-wrap {
+      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+      display: flex; flex-direction: column; gap: 8px; pointer-events: none;
+    }
+    .toast {
+      padding: 12px 20px; border-radius: var(--radius-md); font-size: 14px; font-weight: 600;
+      pointer-events: auto; animation: slideIn 0.3s ease;
+      max-width: 340px; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .toast-ok  { background: #065f46; border: 1px solid #34d399; color: #a7f3d0; }
+    .toast-err { background: #7f1d1d; border: 1px solid #f87171; color: #fca5a5; }
+    @keyframes slideIn { from { transform: translateX(60px); opacity: 0; } }
+
+    @media (max-width: 640px) {
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .detail-grid { grid-template-columns: 1fr; }
+      .decl-actions { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <a href="/" class="header-logo">
+      <div class="logo-icon">⭐</div>
+      award.bi
+    </a>
+    <div style="font-size:13px;font-weight:700;color:var(--purple-l);letter-spacing:0.06em;">🎨 ATELIER DASHBOARD</div>
+    <div class="header-right">
+      <button class="btn btn-outline btn-sm" id="logoutBtn" style="display:none;" onclick="logout()">로그아웃</button>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════
+     LOGIN
+     ═══════════════════════════════════════ -->
+<div id="loginSection" style="display:none;">
+  <div class="login-card">
+    <div style="font-size:32px;margin-bottom:16px;">🎨</div>
+    <h2>아뜰리에 로그인</h2>
+    <p>award.bi 아뜰리에 운영자 JWT 토큰을 입력하세요</p>
+
+    <div class="form-group">
+      <label class="form-label">JWT 토큰</label>
+      <input
+        type="password"
+        class="form-input"
+        id="tokenInput"
+        placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        autocomplete="off"
+      >
+    </div>
+    <button class="btn btn-primary" style="width:100%;" onclick="doLogin()">로그인</button>
+    <div class="login-error" id="loginError"></div>
+
+    <div style="margin-top:24px;padding:14px;background:var(--bg-0);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;color:var(--text-4);line-height:1.7;">
+      <strong style="color:var(--text-3);">토큰 발급 방법 (서버에서):</strong><br>
+      <code style="color:#a78bfa;">node -e "const j=require('jsonwebtoken'); const d=require('dotenv'); d.config(); console.log(j.sign({user_id:'admin',privy_did:'did:privy:admin',role:'atelier',award_site_key:'ak_admin'},process.env.JWT_SECRET,{expiresIn:'7d'}))"</code>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     DASHBOARD
+     ═══════════════════════════════════════ -->
+<div id="dashSection" style="display:none;">
+<div class="atelier-wrap">
+
+  <div class="atelier-topbar">
+    <div>
+      <div style="font-size:20px;font-weight:800;">🎨 아뜰리에 대시보드</div>
+      <div class="user-info" id="userInfoLine">로딩 중...</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <button class="btn btn-outline btn-sm" onclick="loadDeclarations()">🔄 새로고침</button>
+      <button class="btn btn-outline btn-sm" onclick="logout()">로그아웃</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row" id="statsRow">
+    <div class="stat-card">
+      <div class="val" style="color:#f59e0b;" id="statPending">—</div>
+      <div class="lbl">대기 중 (pending)</div>
+    </div>
+    <div class="stat-card">
+      <div class="val" style="color:#34d399;" id="statApproved">—</div>
+      <div class="lbl">승인 완료</div>
+    </div>
+    <div class="stat-card">
+      <div class="val" style="color:#f87171;" id="statFailed">—</div>
+      <div class="lbl">거절</div>
+    </div>
+    <div class="stat-card">
+      <div class="val" style="color:#a78bfa;" id="statTotal">—</div>
+      <div class="lbl">전체 선언</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tab-row">
+    <button class="tab-btn active" data-filter="pending"  onclick="setFilter('pending',this)">⏳ 대기 중</button>
+    <button class="tab-btn"        data-filter="approved" onclick="setFilter('approved',this)">✅ 승인</button>
+    <button class="tab-btn"        data-filter="failed"   onclick="setFilter('failed',this)">❌ 거절</button>
+    <button class="tab-btn"        data-filter=""         onclick="setFilter('',this)">📋 전체</button>
+  </div>
+
+  <!-- Declaration list -->
+  <div class="decl-list" id="declList">
+    <div class="empty-state">
+      <div class="icon">⏳</div>
+      <div class="loading-dots">로딩 중</div>
+    </div>
+  </div>
+
+  <div style="height:60px;"></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     TOAST
+     ═══════════════════════════════════════ -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+const API = 'https://api.award.bi';
+let currentToken = null;
+let currentFilter = 'pending';
+let allDeclarations = [];
+
+const ASSET_CLASS_LABELS = {
+  product_design: '상품 디자인', model_ai: '모델 · AI',
+  logo_trademark: '로고 · 상표', export_cert: '수출면장',
+  membership: '멤버십', other: '기타',
+};
+const ASSET_EMOJIS = {
+  product_design: '🏷️', model_ai: '👤', logo_trademark: '🎨',
+  export_cert: '📜', membership: '💎', other: '📁',
+};
+
+// ─── Auth ─────────────────────────────────────
+async function doLogin() {
+  const token = document.getElementById('tokenInput').value.trim();
+  if (!token) return;
+  const errEl = document.getElementById('loginError');
+  errEl.style.display = 'none';
+
+  try {
+    const res = await fetch(`${API}/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || '인증 실패');
+    if (!['admin', 'atelier'].includes(data.user?.role)) {
+      throw new Error('아뜰리에 권한이 없습니다 (role: ' + data.user?.role + ')');
+    }
+    currentToken = token;
+    sessionStorage.setItem('award_atelier_token', token);
+    sessionStorage.setItem('award_atelier_user', JSON.stringify(data.user));
+    showDashboard(data.user);
+  } catch (e) {
+    errEl.textContent = '❌ ' + e.message;
+    errEl.style.display = 'block';
+  }
+}
+
+function logout() {
+  sessionStorage.removeItem('award_atelier_token');
+  sessionStorage.removeItem('award_atelier_user');
+  currentToken = null;
+  document.getElementById('dashSection').style.display = 'none';
+  document.getElementById('loginSection').style.display = 'block';
+  document.getElementById('logoutBtn').style.display = 'none';
+  document.getElementById('tokenInput').value = '';
+}
+
+function showDashboard(user) {
+  document.getElementById('loginSection').style.display = 'none';
+  document.getElementById('dashSection').style.display = 'block';
+  document.getElementById('logoutBtn').style.display = 'inline-flex';
+  document.getElementById('userInfoLine').innerHTML =
+    `<strong>${user.display_name || user.user_id}</strong> · ${user.role} · ${user.award_site_key || ''}`;
+  loadDeclarations();
+}
+
+// ─── Data ─────────────────────────────────────
+async function loadDeclarations() {
+  document.getElementById('declList').innerHTML =
+    '<div class="empty-state"><div class="icon">⏳</div><div class="loading-dots">로딩 중</div></div>';
+
+  try {
+    // load all for stats
+    const allRes = await fetch(`${API}/declarations`, {
+      headers: { Authorization: `Bearer ${currentToken}` }
+    });
+    const allData = await allRes.json();
+    if (!allRes.ok) throw new Error(allData.error);
+    allDeclarations = allData.declarations || [];
+    updateStats(allDeclarations);
+    renderList();
+  } catch (e) {
+    document.getElementById('declList').innerHTML =
+      `<div class="empty-state"><div class="icon">⚠️</div><div>${e.message}</div></div>`;
+  }
+}
+
+function updateStats(list) {
+  const counts = { pending: 0, approved: 0, failed: 0 };
+  list.forEach(d => { if (counts[d.status] !== undefined) counts[d.status]++; });
+  document.getElementById('statPending').textContent  = counts.pending;
+  document.getElementById('statApproved').textContent = counts.approved;
+  document.getElementById('statFailed').textContent   = counts.failed;
+  document.getElementById('statTotal').textContent    = list.length;
+}
+
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderList();
+}
+
+function renderList() {
+  const list = currentFilter
+    ? allDeclarations.filter(d => d.status === currentFilter)
+    : allDeclarations;
+
+  const container = document.getElementById('declList');
+  if (!list.length) {
+    container.innerHTML =
+      '<div class="empty-state"><div class="icon">📭</div><div>해당 선언이 없습니다</div></div>';
+    return;
+  }
+
+  container.innerHTML = list.map(d => buildCard(d)).join('');
+
+  // Bind toggle expand
+  container.querySelectorAll('.decl-header').forEach(el => {
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('button')) return;
+      const id = el.dataset.id;
+      const detail = document.getElementById(`detail-${id}`);
+      detail.classList.toggle('open');
+    });
+  });
+}
+
+function buildCard(d) {
+  const meta = d.asset_metadata || {};
+  const title = meta.title || meta.asset_name || d.asset_class || '(무제)';
+  const brand = d.brand_name || d.kei_bio_brand_slug || '—';
+  const emoji = ASSET_EMOJIS[d.asset_class] || '📁';
+  const classLabel = ASSET_CLASS_LABELS[d.asset_class] || d.asset_class;
+  const date = d.declared_at ? new Date(d.declared_at).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }) : '—';
+  const isPending = d.status === 'pending';
+
+  const statusBadge = {
+    pending:  '<span class="badge" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:#fcd34d;">⏳ 대기</span>',
+    approved: '<span class="badge badge-green">✓ 승인</span>',
+    failed:   '<span class="badge" style="background:rgba(248,113,113,0.15);border:1px solid rgba(248,113,113,0.3);color:#fca5a5;">✕ 거절</span>',
+  }[d.status] || '';
+
+  const approveBtn = isPending
+    ? `<button class="btn btn-sm" style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.4);color:#34d399;" onclick="approve('${d.declaration_id}',this)">✓ 승인</button>`
+    : '';
+  const rejectBtn = isPending
+    ? `<button class="btn btn-sm" style="background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);color:#f87171;" onclick="toggleReject('${d.declaration_id}')">✕ 거절</button>`
+    : '';
+
+  const thumbSrc = d.source_url
+    ? `<img src="${d.source_url}" alt="" loading="lazy" onerror="this.parentElement.textContent='${emoji}'">`
+    : emoji;
+
+  return `
+<div class="decl-card status-${d.status}" id="card-${d.declaration_id}">
+  <div class="decl-header" data-id="${d.declaration_id}">
+    <div class="asset-thumb">${thumbSrc}</div>
+    <div class="decl-meta">
+      <div class="decl-title">${title}</div>
+      <div class="decl-sub">
+        <span>${statusBadge}</span>
+        <span style="color:var(--text-3);">🏷️ ${classLabel}</span>
+        <span>👤 ${brand}</span>
+        <span>🕐 ${date}</span>
+        ${d.token_category ? `<span class="badge badge-purple" style="font-size:10px;">${d.token_category}</span>` : ''}
+      </div>
+    </div>
+    <div class="decl-actions">
+      ${approveBtn}
+      ${rejectBtn}
+    </div>
+  </div>
+  <div class="decl-detail" id="detail-${d.declaration_id}">
+    <div class="detail-grid">
+      <div class="detail-row">
+        <div class="detail-key">Declaration ID</div>
+        <div class="detail-val">${d.declaration_id}</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-key">Owner DID</div>
+        <div class="detail-val">${d.owner_did || '—'}</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-key">Asset Hash</div>
+        <div class="detail-val">${d.asset_hash || '—'}</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-key">Source URL</div>
+        <div class="detail-val">${d.source_url ? `<a href="${d.source_url}" target="_blank" style="color:var(--purple-l);">보기 ↗</a>` : '—'}</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-key">Metadata</div>
+        <div class="detail-val" style="max-height:80px;overflow:auto;">${JSON.stringify(d.asset_metadata || {}, null, 2)}</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-key">kei.bio Asset ID</div>
+        <div class="detail-val">${(d.asset_metadata || {}).kei_asset_id || '—'}</div>
+      </div>
+    </div>
+    <div class="reject-form" id="reject-${d.declaration_id}">
+      <div style="font-size:12px;font-weight:700;color:#f87171;margin-bottom:6px;margin-top:14px;">거절 사유 (선택)</div>
+      <textarea id="reason-${d.declaration_id}" placeholder="거절 사유를 입력하세요..."></textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="btn btn-sm" style="background:rgba(248,113,113,0.15);border:1px solid rgba(248,113,113,0.4);color:#f87171;" onclick="reject('${d.declaration_id}',this)">거절 확정</button>
+        <button class="btn btn-outline btn-sm" onclick="toggleReject('${d.declaration_id}')">취소</button>
+      </div>
+    </div>
+  </div>
+</div>`;
+}
+
+// ─── Actions ──────────────────────────────────
+async function approve(id, btn) {
+  btn.disabled = true;
+  btn.textContent = '처리 중...';
+  try {
+    const res = await fetch(`${API}/declarations/${id}/approve`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${currentToken}`, 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || data.message);
+    toast(`✅ VC 발행 완료 — ${data.vc_id}`, 'ok');
+    // Update local data
+    const d = allDeclarations.find(x => x.declaration_id === id);
+    if (d) d.status = 'approved';
+    updateStats(allDeclarations);
+    renderList();
+  } catch (e) {
+    toast('❌ ' + e.message, 'err');
+    btn.disabled = false;
+    btn.textContent = '✓ 승인';
+  }
+}
+
+function toggleReject(id) {
+  const form = document.getElementById(`reject-${id}`);
+  form.classList.toggle('open');
+  if (form.classList.contains('open')) {
+    const detail = document.getElementById(`detail-${id}`);
+    detail.classList.add('open');
+  }
+}
+
+async function reject(id, btn) {
+  btn.disabled = true;
+  btn.textContent = '처리 중...';
+  const reason = document.getElementById(`reason-${id}`).value.trim();
+  try {
+    const res = await fetch(`${API}/declarations/${id}/reject`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${currentToken}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reason })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || data.message);
+    toast('거절 처리 완료', 'ok');
+    const d = allDeclarations.find(x => x.declaration_id === id);
+    if (d) d.status = 'failed';
+    updateStats(allDeclarations);
+    renderList();
+  } catch (e) {
+    toast('❌ ' + e.message, 'err');
+    btn.disabled = false;
+    btn.textContent = '거절 확정';
+  }
+}
+
+// ─── Toast ────────────────────────────────────
+function toast(msg, type = 'ok') {
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className = `toast toast-${type}`;
+  el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+
+// ─── Init ─────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const savedToken = sessionStorage.getItem('award_atelier_token');
+  const savedUser  = sessionStorage.getItem('award_atelier_user');
+  if (savedToken && savedUser) {
+    currentToken = savedToken;
+    showDashboard(JSON.parse(savedUser));
+  } else {
+    document.getElementById('loginSection').style.display = 'block';
+  }
+
+  document.getElementById('tokenInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+});
+</script>
+</body>
+</html>

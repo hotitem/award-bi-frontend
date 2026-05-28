@@ -303,84 +303,249 @@
 
 <script src="assets/js/main.js"></script>
 <script>
-// Demo data
-const DEMO_VCS = {
-  'vc-esco-001': {
-    title: 'ESCO Jeju Tangerine Cream — 상품 디자인 SBT',
-    hash: 'a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456',
-    emoji: '🍊', bg: 'linear-gradient(145deg,#3d2600,#7c5a00)',
-    block: '#895,400', date: '2025-05-26'
-  },
-  'vc-esco-002': {
-    title: 'ESCO Elin — AI Model SBT',
-    hash: 'b2c3d4e5f6a789012345678901234567890abcdef1234567890abcdef1234567',
-    emoji: '👩', bg: 'linear-gradient(145deg,#1a0a2e,#2d1060)',
-    block: '#895,406', date: '2025-05-26'
-  },
-  'vc-esco-003': {
-    title: 'ESCO B5 Barrier Cream — 상품 디자인 SBT',
-    hash: '3d9a2f8e1b4c5a7d6e2f9b0c8a1d4e7f3b6c9a2d5e8f1b4c7a0d3e6f9b2c5a8d',
-    emoji: '💙', bg: 'linear-gradient(145deg,#001a35,#003070)',
-    block: '#895,412', date: '2025-05-27'
-  }
-};
+const API = 'https://api.award.bi';
+let currentVcData = null;
 
-function doVerify() {
+// ─── Verify ───────────────────────────────────
+async function doVerify() {
   const input = document.getElementById('verifyInput').value.trim();
   if (!input) { document.getElementById('verifyInput').focus(); return; }
 
-  // Check demo IDs
-  const key = Object.keys(DEMO_VCS).find(k => input.includes(k));
-  if (key) { loadDemo(key); return; }
+  setLoading(true);
 
-  // Show result with input hash
-  showResult({
-    title: '검색된 자산 — VC',
-    hash: input,
-    emoji: '📜', bg: 'linear-gradient(145deg,#141929,#0c1024)',
-    block: '#895,412', date: '2025-05-27'
-  });
+  // SHA-256 hash (64 hex chars) → /verify/hash/:hash
+  const isHash = /^[0-9a-fA-F]{64}$/.test(input);
+  const url = isHash
+    ? `${API}/verify/hash/${encodeURIComponent(input)}`
+    : `${API}/verify/${encodeURIComponent(input)}`;
+
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      if (res.status === 404) throw new Error('인증서를 찾을 수 없습니다');
+      throw new Error(err.error || `오류 ${res.status}`);
+    }
+    const data = await res.json();
+    currentVcData = data;
+    renderResult(data);
+  } catch (e) {
+    showError(e.message);
+  } finally {
+    setLoading(false);
+  }
 }
 
-function loadDemo(id) {
-  document.getElementById('verifyInput').value = id;
-  showResult(DEMO_VCS[id]);
+function setLoading(on) {
+  const btn = document.getElementById('verifyBtn');
+  btn.textContent = on ? '⏳ 검증 중...' : '🔍 검증';
+  btn.disabled = on;
 }
 
-function showResult(data) {
+function showError(msg) {
+  document.getElementById('resultArea').style.display = 'none';
+  document.getElementById('emptyState').style.display = 'block';
+  document.getElementById('emptyState').innerHTML = `
+    <div style="font-size:48px;margin-bottom:16px;opacity:0.6;">⚠️</div>
+    <h2 style="font-size:20px;font-weight:700;color:var(--text-2);margin-bottom:8px;">검증 실패</h2>
+    <p style="color:var(--text-4);">${msg}</p>
+    <button class="btn btn-outline" style="margin-top:20px;" onclick="resetState()">다시 검색</button>`;
+}
+
+function resetState() {
+  document.getElementById('emptyState').innerHTML = `
+    <div style="font-size:64px;margin-bottom:24px;opacity:0.3;">🔍</div>
+    <h2 style="font-size:24px;font-weight:700;color:var(--text-2);margin-bottom:12px;">인증서를 검색하세요</h2>
+    <p style="color:var(--text-4);margin-bottom:32px;">VC ID 또는 SHA-256 해시를 입력하면 W3C 인증서와<br>Bitcoin 각인 정보를 확인할 수 있습니다</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;max-width:700px;margin:0 auto;">
+      <div class="card" style="padding:20px;text-align:center;"><div style="font-size:28px;margin-bottom:8px;">📜</div><div style="font-weight:700;margin-bottom:6px;">W3C VC</div><div style="font-size:13px;color:var(--text-3);">국제 표준 인증서</div></div>
+      <div class="card" style="padding:20px;text-align:center;"><div style="font-size:28px;margin-bottom:8px;">🌲</div><div style="font-weight:700;margin-bottom:6px;">Merkle 증명</div><div style="font-size:13px;color:var(--text-3);">수학적 포함 증명</div></div>
+      <div class="card" style="padding:20px;text-align:center;"><div style="font-size:28px;margin-bottom:8px;">⚓</div><div style="font-weight:700;margin-bottom:6px;">Bitcoin 각인</div><div style="font-size:13px;color:var(--text-3);">영구 블록체인 증명</div></div>
+    </div>`;
+}
+
+function renderResult(data) {
+  const { verification, vc, asset, bitcoin } = data;
+  const isValid     = verification.status === 'valid';
+  const isInscribed = verification.inscribed;
+
+  // Status banner
+  document.getElementById('statusBanner').style.background =
+    isValid ? 'rgba(16,185,129,0.1)' : 'rgba(248,113,113,0.1)';
+  document.getElementById('statusBanner').style.borderColor =
+    isValid ? 'rgba(16,185,129,0.3)' : 'rgba(248,113,113,0.3)';
+  document.getElementById('statusTitle').textContent   = isValid ? '유효한 인증서' : '폐기된 인증서';
+  document.getElementById('statusTitle').style.color   = isValid ? '#34d399' : '#f87171';
+
+  const subParts = ['W3C VC'];
+  if (isInscribed) subParts.push('Bitcoin 각인 완료');
+  else subParts.push('Bitcoin 각인 대기 중');
+  subParts.push(vc.proof_type || 'Ed25519 서명');
+  document.getElementById('statusSub').textContent = subParts.join(' · ');
+
+  // Badges
+  const badgesEl = document.getElementById('statusBanner').querySelector('.badge').parentElement;
+  badgesEl.innerHTML =
+    `<span class="badge ${isValid ? 'badge-green' : 'badge-gray'}">${isValid ? '✓ 유효' : '✕ 폐기'}</span>` +
+    (isInscribed ? '<span class="badge badge-gold">⚓ 각인</span>' : '<span class="badge badge-gray">⏳ 대기</span>') +
+    '<span class="badge badge-purple">📜 W3C VC</span>';
+
+  // Title
+  const assetMeta = asset?.asset_metadata || {};
+  const assetTitle = assetMeta.title || assetMeta.asset_name || vc.vc_id;
+  const brandName  = asset?.brand?.name || '';
+  const typeLabel  = vc.token_type || vc.token_category || 'SBT';
+  document.getElementById('vcTitle').textContent =
+    `${brandName ? brandName + ' — ' : ''}${assetTitle} (${typeLabel})`;
+
+  // Hash
+  document.getElementById('vcHash').textContent =
+    `VC ID: ${vc.vc_id}\nAsset Hash: ${vc.vc_hash || '—'}`;
+
+  // VC JSON
+  const vcJsonEl = document.getElementById('vcJson');
+  const vcObj = vc.vc_json || {};
+  vcJsonEl.innerHTML = '';
+  vcJsonEl.textContent = JSON.stringify(vcObj, null, 2);
+
+  // Merkle + Bitcoin
+  renderBitcoin(bitcoin);
+
+  // Asset Info
+  renderAssetInfo(vc, asset);
+
   document.getElementById('resultArea').style.display = 'block';
   document.getElementById('emptyState').style.display = 'none';
-  document.getElementById('vcTitle').textContent = data.title;
-  document.getElementById('vcHash').textContent =
-    `VC ID: ${document.getElementById('verifyInput').value}\nAsset Hash: ${data.hash}`;
   document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+function renderBitcoin(bitcoin) {
+  if (!bitcoin) {
+    // No inscription yet
+    const merkleEl = document.querySelector('.merkle-path');
+    if (merkleEl) {
+      merkleEl.innerHTML = `
+        <div style="padding:20px;text-align:center;color:var(--text-4);">
+          <div style="font-size:28px;margin-bottom:8px;">⏳</div>
+          <div>다음 자정 배치에서 Bitcoin에 각인됩니다</div>
+        </div>`;
+    }
+    const btcBox = document.querySelector('.btc-proof-box');
+    if (btcBox) btcBox.style.display = 'none';
+    return;
+  }
+
+  // Merkle path
+  const merkleEl = document.querySelector('.merkle-path');
+  if (merkleEl && bitcoin.merkle_path?.length) {
+    const pathHtml = bitcoin.merkle_path.map(node =>
+      `<div class="merkle-node">
+        <div class="direction ${node.direction}">${node.direction}</div>
+        <div class="merkle-hash">${node.hash}</div>
+      </div>`
+    ).join('');
+    merkleEl.innerHTML = `
+      <div style="font-size:11px;color:var(--text-4);margin-bottom:8px;">리프 → 머클 루트 경로</div>
+      ${pathHtml}
+      <div style="padding:10px 14px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:var(--radius-sm);font-size:12px;font-family:'Roboto Mono',monospace;">
+        <span style="color:var(--purple-l);font-weight:700;">Merkle Root: </span>
+        <span style="color:var(--text-2);">${bitcoin.merkle_root || '—'}</span>
+      </div>`;
+  }
+
+  // Bitcoin proof box
+  const btcBox = document.querySelector('.btc-proof-box');
+  if (btcBox) {
+    btcBox.style.display = '';
+    const blockTime = bitcoin.btc_block_time
+      ? new Date(bitcoin.btc_block_time).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })
+      : '—';
+    btcBox.querySelector('.btc-proof-title').textContent = '⚓ Bitcoin 각인 증명';
+    const rows = btcBox.querySelectorAll('.btc-proof-row');
+    if (rows[0]) rows[0].querySelector('.btc-proof-val').textContent = bitcoin.btc_block_height ? `#${bitcoin.btc_block_height.toLocaleString()}` : '—';
+    if (rows[1]) rows[1].querySelector('.btc-proof-val').textContent = blockTime;
+    if (rows[2]) rows[2].querySelector('.btc-proof-val').textContent = bitcoin.btc_tx_hash || '—';
+    if (rows[3]) rows[3].querySelector('.btc-proof-val').innerHTML = bitcoin.ots_file_url
+      ? `<a href="${bitcoin.ots_file_url}" style="color:var(--purple-l);">⬇️ .ots 다운로드</a>`
+      : (bitcoin.ots_status === 'pending' ? '⏳ 대기 중' : '—');
+
+    if (bitcoin.external_links) {
+      const linksEl = btcBox.querySelector('.btc-ext-links');
+      if (linksEl) linksEl.innerHTML =
+        `<a href="${bitcoin.external_links.mempool}" class="btc-ext-link" target="_blank">mempool.space ↗</a>
+         <a href="${bitcoin.external_links.blockstream}" class="btc-ext-link" target="_blank">blockstream ↗</a>
+         <a href="${bitcoin.external_links.blockchain}" class="btc-ext-link" target="_blank">blockchain.com ↗</a>`;
+    }
+  }
+}
+
+function renderAssetInfo(vc, asset) {
+  const infoSection = document.querySelector('.vc-section:nth-child(3)');
+  if (!infoSection) return;
+  const meta  = asset?.asset_metadata || {};
+  const brand = asset?.brand;
+  const issuedDate = vc.issued_at ? new Date(vc.issued_at).toLocaleDateString('ko-KR') : '—';
+  const rows = infoSection.querySelectorAll('[style*="justify-content:space-between"]');
+  const setText = (el, val) => { if (el) el.querySelector('span:last-child, a').textContent = val; };
+  if (rows[0]) rows[0].querySelector('span:last-child').innerHTML =
+    brand ? `<a href="/brand/${brand.slug}" style="color:var(--purple-l);">${brand.name}</a>` : '—';
+  if (rows[1]) rows[1].querySelector('span:last-child').innerHTML =
+    `<span class="badge badge-purple" style="font-size:11px;">${vc.token_category || vc.token_type || 'SBT'}</span>`;
+  if (rows[2]) rows[2].querySelector('span:last-child').textContent = vc.issuer_did || '—';
+  if (rows[3]) rows[3].querySelector('span:last-child').textContent = vc.subject_did || '—';
+  if (rows[4]) rows[4].querySelector('span:last-child').textContent = issuedDate;
+  if (rows[5]) rows[5].querySelector('span:last-child').innerHTML =
+    vc.is_valid && !vc.revoked_at
+      ? '<span class="badge badge-green">✓ 유효</span>'
+      : '<span class="badge badge-gray">✕ 폐기</span>';
+}
+
+// ─── Quick demo links (try real API first) ────
+function loadDemo(id) {
+  document.getElementById('verifyInput').value = id;
+  doVerify();
+}
+
+// ─── Copy / Download / Share ─────────────────
 function copyVC() {
-  navigator.clipboard.writeText(document.getElementById('vcJson').innerText)
+  const text = currentVcData
+    ? JSON.stringify(currentVcData.vc?.vc_json || currentVcData, null, 2)
+    : document.getElementById('vcJson').innerText;
+  navigator.clipboard.writeText(text)
     .then(() => alert('✅ W3C VC JSON이 클립보드에 복사되었습니다'));
 }
 function shareVC() {
-  navigator.clipboard.writeText(window.location.href)
+  const url = new URL(window.location.href);
+  if (currentVcData?.vc?.vc_id) {
+    url.searchParams.set('id', currentVcData.vc.vc_id);
+  }
+  navigator.clipboard.writeText(url.href)
     .then(() => alert('✅ 인증서 링크가 복사되었습니다'));
 }
 function downloadVC() {
-  const blob = new Blob([document.getElementById('vcJson').innerText], {type:'application/json'});
+  const data = currentVcData?.vc?.vc_json || {};
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'award-bi-vc.json';
+  a.download = `${currentVcData?.vc?.vc_id || 'vc'}.json`;
   a.click();
 }
 function downloadOTS() {
-  alert('⚓ .ots 파일 다운로드는 실제 서버 연동 후 지원됩니다');
+  const otsUrl = currentVcData?.bitcoin?.ots_file_url;
+  if (otsUrl) {
+    window.open(otsUrl, '_blank');
+  } else {
+    alert('⚓ .ots 파일은 Bitcoin 각인 완료 후 제공됩니다');
+  }
 }
 
-// Auto-load from URL param
+// ─── Init ────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
   const id = params.get('id');
-  if (id && DEMO_VCS[id]) {
-    loadDemo(id);
+  if (id) {
+    document.getElementById('verifyInput').value = id;
+    doVerify();
   }
   document.getElementById('verifyInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') doVerify();

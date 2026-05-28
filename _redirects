@@ -5,3 +5,5 @@
 /esco            /brand/esco.html   301
 /verify          /verify.html       301
 /v/:id           /verify.html?id=:id 301
+/atelier         /atelier.html      301
+/admin           /atelier.html      301
