@@ -376,7 +376,7 @@
             <div class="trending-logo" style="background:linear-gradient(135deg,#7c3aed,#4f46e5);">🧴</div>
             <div class="trending-info">
               <div class="trending-name">ESCO</div>
-              <div class="trending-sub">SBT 7건 · NFT 1,000개</div>
+              <div class="trending-sub">SBT 7건 인증</div>
             </div>
             <div class="trending-change">+12.4%</div>
           </div>
@@ -516,12 +516,12 @@
       <p class="section-sub">award.bi 아뜰리에가 인증한 K-Beauty 브랜드의 자산을 확인하세요</p>
     </div>
 
-    <!-- ESCO Brand Card -->
-    <div style="background:var(--bg-card);border:1px solid var(--border-2);border-radius:var(--radius-xl);overflow:hidden;margin-bottom:48px;">
+    <!-- ESCO Brand Card — 동적 로딩 -->
+    <div id="escoBrandCard" style="background:var(--bg-card);border:1px solid var(--border-2);border-radius:var(--radius-xl);overflow:hidden;margin-bottom:48px;">
       <div style="padding:32px;display:flex;align-items:center;gap:24px;border-bottom:1px solid var(--border);">
         <div style="width:72px;height:72px;border-radius:16px;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:36px;box-shadow:0 0 30px rgba(124,58,237,0.3);">🧴</div>
         <div style="flex:1;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;">
             <h3 style="font-size:24px;font-weight:900;">ESCO</h3>
             <span class="badge badge-green">✓ Kei 공식인증</span>
             <span class="badge badge-purple">⭐ award.bi 아뜰리에</span>
@@ -530,107 +530,117 @@
         </div>
         <div style="display:flex;gap:24px;">
           <div style="text-align:center;">
-            <div style="font-size:22px;font-weight:800;color:#a78bfa;">7</div>
+            <div id="escoSbtCount" style="font-size:22px;font-weight:800;color:#a78bfa;">—</div>
             <div style="font-size:11px;color:var(--text-3);">SBT</div>
           </div>
           <div style="text-align:center;">
-            <div style="font-size:22px;font-weight:800;color:#fcd34d;">1,000</div>
-            <div style="font-size:11px;color:var(--text-3);">NFT</div>
-          </div>
-          <div style="text-align:center;">
-            <div style="font-size:22px;font-weight:800;color:#34d399;">38</div>
+            <div id="escoInscribeCount" style="font-size:22px;font-weight:800;color:#34d399;">—</div>
             <div style="font-size:11px;color:var(--text-3);">각인</div>
           </div>
         </div>
         <a href="/brand/esco.html" class="btn btn-primary btn-sm">전체 보기 →</a>
       </div>
 
-      <!-- Asset mini grid -->
-      <div style="padding:24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;">
-        <!-- Asset 1 -->
-        <div class="asset-card">
-          <div class="asset-card-img" style="aspect-ratio:1;">
-            <div class="asset-img-bg" style="background:linear-gradient(145deg,#3d2600,#7c5a00);"></div>
-            <div class="asset-img-content">🍊</div>
-            <div class="asset-type-badge"><span class="tag tag-design">상품 디자인</span></div>
-            <div class="asset-chain-badge">
-              <div class="asset-sbt-tag">⭐ SBT</div>
-              <a href="#" class="opensea-link">OpenSea ↗</a>
-            </div>
-          </div>
-          <div class="asset-card-body">
-            <div class="asset-card-name">Jeju Tangerine Cream</div>
-            <div class="asset-card-actions">
-              <a href="/verify.html?id=vc-esco-001" class="btn btn-outline btn-sm">🔍 SBT 보기</a>
-            </div>
-          </div>
-        </div>
-        <!-- Asset 2 -->
-        <div class="asset-card">
-          <div class="asset-card-img" style="aspect-ratio:1;">
-            <div class="asset-img-bg" style="background:linear-gradient(145deg,#1a0a2e,#2d1060);"></div>
-            <div class="asset-img-content">👩</div>
-            <div class="asset-type-badge"><span class="tag tag-model">모델 · AI</span></div>
-            <div class="asset-verified-badge">✓ Kei 공식인증</div>
-            <div class="asset-chain-badge">
-              <div class="asset-sbt-tag">⭐ SBT</div>
-              <a href="#" class="opensea-link">OpenSea ↗</a>
-            </div>
-          </div>
-          <div class="asset-card-body">
-            <div class="asset-card-name">Elin — AI Model</div>
-            <div class="asset-card-actions">
-              <span class="badge badge-green" style="font-size:11px;">✓ 공식인증</span>
-              <a href="/verify.html?id=vc-esco-002" class="btn btn-outline btn-sm">🔍 SBT</a>
-            </div>
-          </div>
-        </div>
-        <!-- Asset 3 -->
-        <div class="asset-card">
-          <div class="asset-card-img" style="aspect-ratio:1;">
-            <div class="asset-img-bg" style="background:linear-gradient(145deg,#001a35,#003070);"></div>
-            <div class="asset-img-content">💙</div>
-            <div class="asset-type-badge"><span class="tag tag-design">상품 디자인</span></div>
-            <div class="asset-verified-badge">✓ Kei 공식인증</div>
-            <div class="asset-chain-badge">
-              <div class="asset-sbt-tag">⭐ SBT</div>
-              <a href="#" class="opensea-link">OpenSea ↗</a>
-            </div>
-          </div>
-          <div class="asset-card-body">
-            <div class="asset-card-name">B5 Barrier Cream</div>
-            <div class="asset-card-actions">
-              <span class="badge badge-green" style="font-size:11px;">✓ 공식인증</span>
-              <a href="/verify.html?id=vc-esco-003" class="btn btn-outline btn-sm">🔍 SBT</a>
-            </div>
-          </div>
-        </div>
-        <!-- Asset 4 — 로그인 필요 -->
-        <div class="asset-card">
-          <div class="asset-card-img" style="aspect-ratio:1;position:relative;">
-            <div class="asset-img-bg" style="background:linear-gradient(145deg,#0f172a,#1e293b);filter:blur(4px);"></div>
-            <div class="lock-overlay">
-              <div class="lock-icon">🔒</div>
-              <div class="lock-title">명함 이미지 잠금</div>
-              <div class="lock-sub">맞팔 회원만 열람 가능<br>로그인 후 요청 가능</div>
-              <a href="https://kei.bio/login" class="btn btn-primary btn-sm" target="_blank">로그인 →</a>
-            </div>
-          </div>
-          <div class="asset-card-body">
-            <div class="asset-card-name" style="color:var(--text-4);">로고 · 명함</div>
-            <div class="asset-card-actions">
-              <span class="badge badge-gray">🔒 잠금</span>
-            </div>
-          </div>
-        </div>
+      <!-- 동적 자산 카드 -->
+      <div id="escoAssetGrid" style="padding:24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;">
+        <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-4);">⏳ 로딩 중...</div>
       </div>
 
       <div style="padding:0 24px 24px;text-align:center;">
         <a href="/brand/esco.html" class="btn btn-outline">
-          ESCO 전체 자산 보기 (7개 SBT · 1,000개 NFT) →
+          ESCO 전체 인증 자산 보기 →
         </a>
       </div>
     </div>
+
+    <script>
+    (async function loadEscoShowcase() {
+      const API = 'https://api.award.bi';
+      const ASSET_CLASS = {
+        brand_logo:'로고 · 명함', product_design:'상품 디자인',
+        model_portrait:'모델 · AI', brand_video:'영상', brand_identity:'브랜드'
+      };
+      const TAG_CLASS = {
+        brand_logo:'tag-logo', product_design:'tag-design',
+        model_portrait:'tag-model', brand_video:'tag-video', brand_identity:'tag-design'
+      };
+
+      try {
+        // 브랜드 통계
+        const brandRes = await fetch(`${API}/brands/esco`);
+        const brandData = await brandRes.json();
+        if (brandData.ok) {
+          document.getElementById('escoSbtCount').textContent = brandData.brand.sbt_count || '—';
+          document.getElementById('escoInscribeCount').textContent = brandData.brand.nft_minted || '—';
+        }
+
+        // 인증 자산 (이미지/영상만, 최대 4개)
+        const assetsRes = await fetch(`${API}/brands/esco/assets?status=vc_issued&limit=8`);
+        const assetsData = await assetsRes.json();
+        const assets = (assetsData.assets || [])
+          .filter(a => a.asset_class !== 'brand_logo') // 로고·명함은 잠금 처리
+          .slice(0, 3);
+
+        const grid = document.getElementById('escoAssetGrid');
+        if (!assets.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-4);">인증 자산 없음</div>'; return; }
+
+        const cards = assets.map(a => {
+          const meta = a.asset_metadata || {};
+          const title = meta.title || a.asset_class;
+          const isVideo = /\.(mp4|webm|mov)/i.test(a.source_url || '');
+          const tagCls = TAG_CLASS[a.asset_class] || 'tag-design';
+          const tagLabel = ASSET_CLASS[a.asset_class] || a.asset_class;
+          const isOfficial = a.atelier_approved_at;
+          const vcLink = a.vc_id ? `/verify.html?id=${a.vc_id}` : '#';
+
+          const media = isVideo
+            ? `<video src="${a.source_url}" muted autoplay loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;" onerror="this.style.display='none'"></video>`
+            : `<img src="${a.source_url}" alt="${title}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;" onerror="this.style.display='none'">`;
+
+          return `
+<div class="asset-card">
+  <div class="asset-card-img" style="aspect-ratio:1;position:relative;background:#1a1a2e;">
+    ${media}
+    <div class="asset-type-badge"><span class="tag ${tagCls}">${tagLabel}</span></div>
+    ${isOfficial ? '<div class="asset-verified-badge">✓ Kei 공식인증</div>' : ''}
+    <div class="asset-chain-badge">
+      <div class="asset-sbt-tag">⭐ SBT</div>
+    </div>
+  </div>
+  <div class="asset-card-body">
+    <div class="asset-card-name">${title}</div>
+    <div class="asset-card-actions">
+      ${isOfficial ? '<span class="badge badge-green" style="font-size:11px;">✓ 공식인증</span>' : ''}
+      ${a.vc_id ? `<a href="${vcLink}" class="btn btn-outline btn-sm">🔍 SBT</a>` : ''}
+    </div>
+  </div>
+</div>`;
+        }).join('');
+
+        // 로고 잠금 카드 고정 추가
+        const lockCard = `
+<div class="asset-card">
+  <div class="asset-card-img" style="aspect-ratio:1;position:relative;">
+    <div class="asset-img-bg" style="background:linear-gradient(145deg,#0f172a,#1e293b);filter:blur(4px);"></div>
+    <div class="lock-overlay">
+      <div class="lock-icon">🔒</div>
+      <div class="lock-title">명함 이미지 잠금</div>
+      <div class="lock-sub">맞팔 회원만 열람 가능<br>로그인 후 요청 가능</div>
+      <a href="https://kei.bio" class="btn btn-primary btn-sm" target="_blank">로그인 →</a>
+    </div>
+  </div>
+  <div class="asset-card-body">
+    <div class="asset-card-name" style="color:var(--text-4);">로고 · 명함</div>
+    <div class="asset-card-actions"><span class="badge badge-gray">🔒 잠금</span></div>
+  </div>
+</div>`;
+
+        grid.innerHTML = cards + lockCard;
+      } catch(e) {
+        console.warn('[showcase]', e.message);
+      }
+    })();
+    </script>
   </div>
 </section>
 
