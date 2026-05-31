@@ -253,6 +253,11 @@ let currentToken = null;
 let currentFilter = 'pending';
 let allDeclarations = [];
 
+// DB status → display 정규화 (vc_issued → approved)
+function normalizeStatus(d) {
+  return { ...d, status: d.status === 'vc_issued' ? 'approved' : d.status };
+}
+
 const ASSET_CLASS_LABELS = {
   product_design: '상품 디자인', model_ai: '모델 · AI',
   logo_trademark: '로고 · 상표', export_cert: '수출면장',
@@ -315,12 +320,12 @@ async function loadDeclarations() {
 
   try {
     // load all for stats
-    const allRes = await fetch(`${API}/declarations`, {
+    const allRes = await fetch(`${API}/declarations?limit=500&page=1`, {
       headers: { Authorization: `Bearer ${currentToken}` }
     });
     const allData = await allRes.json();
     if (!allRes.ok) throw new Error(allData.error);
-    allDeclarations = allData.declarations || [];
+    allDeclarations = (allData.declarations || []).map(normalizeStatus);
     updateStats(allDeclarations);
     renderList();
   } catch (e) {
