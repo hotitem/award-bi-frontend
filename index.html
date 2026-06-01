@@ -584,25 +584,36 @@
         const grid = document.getElementById('escoAssetGrid');
         if (!assets.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-4);">인증 자산 없음</div>'; return; }
 
+        const VIDEO_TITLE = { brand_video:'브랜드 영상', brand_identity:'브랜드 자산' };
         const cards = assets.map(a => {
           const meta = a.asset_metadata || {};
-          const title = meta.title || a.asset_class;
+          // 타이틀: metadata.title 우선, 없으면 asset_class 한글 fallback
+          const title = (meta.title && meta.title !== a.asset_class)
+            ? meta.title
+            : (VIDEO_TITLE[a.asset_class] || ASSET_CLASS[a.asset_class] || a.asset_class);
           const isVideo = /\.(mp4|webm|mov)/i.test(a.source_url || '');
           const tagCls = TAG_CLASS[a.asset_class] || 'tag-design';
           const tagLabel = ASSET_CLASS[a.asset_class] || a.asset_class;
-          const isOfficial = a.atelier_approved_at;
-          const vcLink = a.vc_id ? `/verify.html?id=${a.vc_id}` : '#';
+          const isCertified = Boolean(a.atelier_approved_at);
+          const vcLink = a.vc_id ? `/verify.html?id=${a.vc_id}` : 'https://award.bi/verify.html';
 
           const media = isVideo
             ? `<video src="${a.source_url}" muted autoplay loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;" onerror="this.style.display='none'"></video>`
             : `<img src="${a.source_url}" alt="${title}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;" onerror="this.style.display='none'">`;
+
+          // award.bi 인증 앰블럼 (purple)
+          const awardBadge = isCertified
+            ? `<a href="${vcLink}" target="_blank" style="position:absolute;top:8px;right:8px;display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:8px;background:linear-gradient(135deg,rgba(124,58,237,0.92),rgba(79,70,229,0.92));text-decoration:none;box-shadow:0 2px 8px rgba(124,58,237,0.4);">
+                <span style="font-size:10px;">⭐</span>
+                <span style="font-size:9px;font-weight:800;color:#fff;letter-spacing:0.05em;">award.bi</span>
+              </a>` : '';
 
           return `
 <div class="asset-card">
   <div class="asset-card-img" style="aspect-ratio:1;position:relative;background:#1a1a2e;">
     ${media}
     <div class="asset-type-badge"><span class="tag ${tagCls}">${tagLabel}</span></div>
-    ${isOfficial ? '<div class="asset-verified-badge">✓ Kei 공식인증</div>' : ''}
+    ${awardBadge}
     <div class="asset-chain-badge">
       <div class="asset-sbt-tag">⭐ SBT</div>
     </div>
@@ -610,7 +621,7 @@
   <div class="asset-card-body">
     <div class="asset-card-name">${title}</div>
     <div class="asset-card-actions">
-      ${isOfficial ? '<span class="badge badge-green" style="font-size:11px;">✓ 공식인증</span>' : ''}
+      ${isCertified ? `<a href="${vcLink}" target="_blank" style="display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:100px;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;font-size:10px;font-weight:800;text-decoration:none;">⭐ award.bi 인증</a>` : ''}
       ${a.vc_id ? `<a href="${vcLink}" class="btn btn-outline btn-sm">🔍 SBT</a>` : ''}
     </div>
   </div>
