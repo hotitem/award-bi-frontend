@@ -155,7 +155,8 @@
         <div class="vc-section">
           <div class="vc-section-title">🌲 Merkle 증명 경로</div>
           <div style="margin-bottom:16px;">
-            <div style="font-size:13px;color:var(--text-3);margin-bottom:8px;">배치 날짜: <strong style="color:var(--text-1);">2025-05-27</strong> · 배치 내 순서: <strong style="color:var(--text-1);">#3 / 247</strong></div>
+            <div style="font-size:13px;color:var(--text-3);margin-bottom:8px;">배치 날짜: <strong id="batchDate" style="color:var(--text-1);">—</strong> · 배치 내 순서: <strong id="leafIndex" style="color:var(--text-1);">—</strong></div>
+            <div id="otsStatusLine" style="font-size:12px;color:var(--text-4);"></div>
           </div>
           <div class="merkle-path">
             <div style="font-size:11px;color:var(--text-4);margin-bottom:8px;">리프 → 머클 루트 경로 (아래에서 위로)</div>
@@ -513,8 +514,15 @@ function renderResult(data) {
 }
 
 function renderBitcoin(bitcoin) {
+  // 배치 날짜 · 순서 업데이트
+  const batchDateEl = document.getElementById('batchDate');
+  const leafIndexEl = document.getElementById('leafIndex');
+  const otsStatusEl = document.getElementById('otsStatusLine');
+
   if (!bitcoin) {
-    // No inscription yet
+    if (batchDateEl) batchDateEl.textContent = '—';
+    if (leafIndexEl) leafIndexEl.textContent = '—';
+    if (otsStatusEl) otsStatusEl.textContent = '';
     const merkleEl = document.querySelector('.merkle-path');
     if (merkleEl) {
       merkleEl.innerHTML = `
@@ -527,6 +535,22 @@ function renderBitcoin(bitcoin) {
     if (btcBox) btcBox.style.display = 'none';
     return;
   }
+
+  if (batchDateEl) batchDateEl.textContent = bitcoin.batch_date || '—';
+  if (leafIndexEl) {
+    const idx = bitcoin.leaf_index != null ? `#${bitcoin.leaf_index + 1}` : '—';
+    const total = bitcoin.batch_vc_count != null ? ` / ${bitcoin.batch_vc_count}` : '';
+    leafIndexEl.textContent = idx + total;
+  }
+
+  // OTS 상태 한 줄 표시
+  const statusMap = {
+    pending:   '⏳ 배치 대기 중',
+    submitted: '📡 OTS 캘린더 제출 완료 · Bitcoin 블록 컨펌 대기 중',
+    confirmed: '⚓ Bitcoin 블록 각인 완료',
+    failed:    '❌ OTS 제출 실패',
+  };
+  if (otsStatusEl) otsStatusEl.textContent = statusMap[bitcoin.ots_status] || bitcoin.ots_status || '';
 
   // Merkle path
   const merkleEl = document.querySelector('.merkle-path');
@@ -550,24 +574,37 @@ function renderBitcoin(bitcoin) {
   const btcBox = document.querySelector('.btc-proof-box');
   if (btcBox) {
     btcBox.style.display = '';
+    const isConfirmed = bitcoin.ots_status === 'confirmed';
+    const isSubmitted = bitcoin.ots_status === 'submitted';
     const blockTime = bitcoin.btc_block_time
       ? new Date(bitcoin.btc_block_time).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })
       : '—';
-    btcBox.querySelector('.btc-proof-title').textContent = '⚓ Bitcoin 각인 증명';
+    btcBox.querySelector('.btc-proof-title').textContent =
+      isConfirmed ? '⚓ Bitcoin 각인 증명' : '📡 OpenTimestamps 제출 현황';
     const rows = btcBox.querySelectorAll('.btc-proof-row');
-    if (rows[0]) rows[0].querySelector('.btc-proof-val').textContent = bitcoin.btc_block_height ? `#${bitcoin.btc_block_height.toLocaleString()}` : '—';
-    if (rows[1]) rows[1].querySelector('.btc-proof-val').textContent = blockTime;
-    if (rows[2]) rows[2].querySelector('.btc-proof-val').textContent = bitcoin.btc_tx_hash || '—';
-    if (rows[3]) rows[3].querySelector('.btc-proof-val').innerHTML = bitcoin.ots_file_url
-      ? `<a href="${bitcoin.ots_file_url}" style="color:var(--purple-l);">⬇️ Bitcoin 증명 다운로드</a>`
-      : (bitcoin.ots_status === 'pending' ? '⏳ 대기 중' : '—');
+    if (rows[0]) rows[0].querySelector('.btc-proof-val').textContent =
+      bitcoin.btc_block_height ? `#${bitcoin.btc_block_height.toLocaleString()}` : (isSubmitted ? '컨펌 대기 중' : '—');
+    if (rows[1]) rows[1].querySelector('.btc-proof-val').textContent =
+      isConfirmed ? blockTime : (isSubmitted ? 'Bitcoin 네트워크 처리 중' : '—');
+    if (rows[2]) rows[2].querySelector('.btc-proof-val').textContent =
+      bitcoin.btc_tx_hash || (isSubmitted ? '블록 포함 대기 중' : '—');
+    if (rows[3]) rows[3].querySelector('.btc-proof-val').innerHTML =
+      bitcoin.ots_file_url && isConfirmed
+        ? `<a href="${bitcoin.ots_file_url}" style="color:var(--purple-l);">⬇️ Bitcoin 증명 다운로드</a>`
+        : (isSubmitted ? '⏳ 블록 컨펌 후 제공' : '—');
 
-    if (bitcoin.external_links) {
-      const linksEl = btcBox.querySelector('.btc-ext-links');
-      if (linksEl) linksEl.innerHTML =
-        `<a href="${bitcoin.external_links.mempool}" class="btc-ext-link" target="_blank">mempool.space ↗</a>
-         <a href="${bitcoin.external_links.blockstream}" class="btc-ext-link" target="_blank">blockstream ↗</a>
-         <a href="${bitcoin.external_links.blockchain}" class="btc-ext-link" target="_blank">blockchain.com ↗</a>`;
+    const linksEl = btcBox.querySelector('.btc-ext-links');
+    if (linksEl) {
+      if (bitcoin.external_links) {
+        linksEl.innerHTML =
+          `<a href="${bitcoin.external_links.mempool}" class="btc-ext-link" target="_blank">mempool.space ↗</a>
+           <a href="${bitcoin.external_links.blockstream}" class="btc-ext-link" target="_blank">blockstream ↗</a>
+           <a href="${bitcoin.external_links.blockchain}" class="btc-ext-link" target="_blank">blockchain.com ↗</a>`;
+      } else if (isSubmitted) {
+        linksEl.innerHTML = `<span style="font-size:12px;color:var(--text-4);">Bitcoin 블록 컨펌 후 TX 링크가 생성됩니다</span>`;
+      } else {
+        linksEl.innerHTML = '';
+      }
     }
   }
 }
