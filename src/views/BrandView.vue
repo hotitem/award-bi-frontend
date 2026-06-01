@@ -41,19 +41,44 @@
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
           <div
             v-for="asset in assets" :key="asset.declaration_id"
-            class="card-hover p-4 cursor-pointer"
+            class="card-hover p-4 cursor-pointer group"
             @click="router.push(`/verify?id=${asset.vc_id}`)"
           >
-            <div class="aspect-square rounded-md bg-bg-0 border border-white/5 overflow-hidden mb-3 flex items-center justify-center">
-              <img v-if="asset.source_url" :src="asset.source_url" :alt="asset.asset_metadata?.name ?? ''" class="w-full h-full object-cover" />
-              <span v-else class="text-4xl opacity-30">🖼</span>
+            <!-- 미디어 (이미지 / 영상 자동 감지) -->
+            <div class="relative aspect-video rounded-md bg-bg-0 border border-white/5 overflow-hidden mb-3">
+              <!-- 영상 -->
+              <template v-if="isVideo(asset.source_url, asset.asset_class)">
+                <video
+                  :src="asset.source_url"
+                  class="w-full h-full object-cover"
+                  muted
+                  loop
+                  playsinline
+                  preload="metadata"
+                  @mouseenter="(e) => (e.target as HTMLVideoElement).play()"
+                  @mouseleave="(e) => { (e.target as HTMLVideoElement).pause(); (e.target as HTMLVideoElement).currentTime = 0 }"
+                />
+                <div class="absolute inset-0 flex items-center justify-center opacity-70 group-hover:opacity-0 transition-opacity pointer-events-none">
+                  <div class="w-10 h-10 rounded-full bg-black/60 flex items-center justify-center text-white text-lg">▶</div>
+                </div>
+                <span class="absolute top-2 left-2 badge badge-gold text-[9px]">🎬 VIDEO</span>
+              </template>
+              <!-- 이미지 -->
+              <template v-else-if="asset.source_url">
+                <img :src="asset.source_url" :alt="asset.asset_metadata?.title ?? ''"
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+              </template>
+              <span v-else class="absolute inset-0 flex items-center justify-center text-4xl opacity-30">🖼</span>
             </div>
-            <div class="text-sm font-semibold text-txt-1 mb-1 truncate">
+
+            <div class="text-sm font-semibold text-txt-1 mb-1.5 truncate">
               {{ asset.asset_metadata?.title ?? asset.asset_metadata?.name ?? asset.asset_class }}
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
               <span class="badge badge-purple text-[10px]">{{ asset.token_category }}</span>
               <span v-if="asset.vc_id" class="badge badge-green text-[10px]">✓ VC</span>
+              <span v-if="asset.ots_status === 'submitted'" class="badge badge-gold text-[9px]">📡 BTC</span>
+              <span v-if="asset.ots_status === 'confirmed'" class="badge badge-green text-[9px]">⚓ 각인</span>
             </div>
           </div>
         </div>
@@ -77,6 +102,13 @@ import { getBrand, getBrandAssets, createShortUrl } from '@/api/award'
 const { t } = useI18n()
 const route  = useRoute()
 const router = useRouter()
+
+const VIDEO_EXTS = ['.mp4', '.mov', '.webm', '.ogg', '.m4v']
+function isVideo(url?: string, assetClass?: string): boolean {
+  if (assetClass === 'brand_video') return true
+  if (!url) return false
+  return VIDEO_EXTS.some(ext => url.toLowerCase().includes(ext))
+}
 
 const brand    = ref<Record<string,unknown> | null>(null)
 const assets   = ref<Record<string,unknown>[]>([])
