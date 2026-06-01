@@ -10,6 +10,7 @@
   <meta property="og:image" content="https://award.bi/assets/og.png">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%237c3aed'/><text y='22' x='5' font-size='18'>⭐</text></svg>">
   <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 </head>
 <body>
 
@@ -328,42 +329,98 @@
         <h2 style="font-size:26px;font-weight:800;margin-bottom:24px;">
           실시간 글로벌 인증 현황
         </h2>
-        <div class="map-container">
-          <div class="map-bg"></div>
-          <!-- Simplified world map SVG -->
-          <svg class="map-svg" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;">
-            <!-- Continents simplified shapes -->
-            <path d="M80,120 L200,100 L220,160 L180,200 L100,180 Z" fill="rgba(124,58,237,0.08)" stroke="rgba(124,58,237,0.2)" stroke-width="1"/>
-            <path d="M220,80 L380,60 L420,120 L400,200 L300,220 L240,160 Z" fill="rgba(59,130,246,0.08)" stroke="rgba(59,130,246,0.2)" stroke-width="1"/>
-            <path d="M440,60 L580,80 L600,180 L560,220 L480,200 L440,140 Z" fill="rgba(16,185,129,0.08)" stroke="rgba(16,185,129,0.2)" stroke-width="1"/>
-            <path d="M580,100 L700,80 L720,160 L680,200 L600,180 Z" fill="rgba(124,58,237,0.08)" stroke="rgba(124,58,237,0.2)" stroke-width="1"/>
-            <path d="M120,220 L200,240 L200,340 L140,320 L80,280 Z" fill="rgba(245,158,11,0.06)" stroke="rgba(245,158,11,0.15)" stroke-width="1"/>
-            <path d="M260,240 L340,260 L320,360 L260,340 Z" fill="rgba(236,72,153,0.06)" stroke="rgba(236,72,153,0.15)" stroke-width="1"/>
-            <path d="M460,240 L560,220 L580,320 L520,340 L460,300 Z" fill="rgba(16,185,129,0.06)" stroke="rgba(16,185,129,0.15)" stroke-width="1"/>
-          </svg>
-          <!-- Activity dots -->
-          <div class="map-pulse pulse-1" title="서울 · ESCO SBT 발행"></div>
-          <div class="map-pulse pulse-2" title="도쿄 · K-Beauty 인증"></div>
-          <div class="map-pulse pulse-3" title="상하이 · 정품인증 NFT"></div>
-          <div class="map-pulse pulse-4" title="뉴욕 · Bitcoin 각인"></div>
-          <div class="map-pulse pulse-5" title="파리 · VC 검증"></div>
+        <div class="map-container" style="position:relative;border-radius:24px;overflow:hidden;height:360px;background:#0a0d17;">
+          <!-- Leaflet 실제 세계 지도 -->
+          <div id="worldLeafletMap" style="width:100%;height:100%;border-radius:24px;"></div>
 
           <!-- Activity count overlay -->
-          <div style="position:absolute;bottom:16px;left:16px;right:16px;display:flex;gap:12px;">
-            <div style="padding:8px 14px;background:rgba(20,25,41,0.85);backdrop-filter:blur(8px);border:1px solid rgba(124,58,237,0.3);border-radius:8px;text-align:center;">
+          <div style="position:absolute;bottom:16px;left:16px;right:16px;display:flex;gap:12px;z-index:1000;pointer-events:none;">
+            <div style="padding:8px 14px;background:rgba(10,13,23,0.88);backdrop-filter:blur(8px);border:1px solid rgba(124,58,237,0.4);border-radius:8px;text-align:center;">
               <div style="font-size:18px;font-weight:800;color:#a78bfa;">8,241</div>
               <div style="font-size:10px;color:#64748b;">서울</div>
             </div>
-            <div style="padding:8px 14px;background:rgba(20,25,41,0.85);backdrop-filter:blur(8px);border:1px solid rgba(16,185,129,0.3);border-radius:8px;text-align:center;">
+            <div style="padding:8px 14px;background:rgba(10,13,23,0.88);backdrop-filter:blur(8px);border:1px solid rgba(16,185,129,0.4);border-radius:8px;text-align:center;">
               <div style="font-size:18px;font-weight:800;color:#34d399;">2,165</div>
               <div style="font-size:10px;color:#64748b;">글로벌</div>
             </div>
-            <div style="padding:8px 14px;background:rgba(20,25,41,0.85);backdrop-filter:blur(8px);border:1px solid rgba(245,158,11,0.3);border-radius:8px;text-align:center;">
-              <div style="font-size:18px;font-weight:800;color:#fcd34d;">1,88</div>
+            <div style="padding:8px 14px;background:rgba(10,13,23,0.88);backdrop-filter:blur(8px);border:1px solid rgba(245,158,11,0.4);border-radius:8px;text-align:center;">
+              <div style="font-size:18px;font-weight:800;color:#fcd34d;">42+</div>
               <div style="font-size:10px;color:#64748b;">파트너</div>
             </div>
           </div>
         </div>
+        <script>
+        // Leaflet 세계 지도 초기화 (leaflet.js onload 콜백)
+        function initWorldMap() {
+          if (typeof L === 'undefined' || document.getElementById('worldLeafletMap')._leaflet_id) return;
+          const map = L.map('worldLeafletMap', {
+            center: [25, 40],
+            zoom: 2,
+            zoomControl: false,
+            dragging: false,
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            touchZoom: false,
+            keyboard: false,
+            attributionControl: true,
+          });
+
+          L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+            attribution: '© <a href="https://www.openstreetmap.org/copyright" style="color:#4b5563">OpenStreetMap</a> © <a href="https://carto.com/attributions" style="color:#4b5563">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 20
+          }).addTo(map);
+
+          // 도시별 pulse 마커
+          const cities = [
+            { lat: 37.57, lng: 126.98, color: '#a78bfa', label: '서울 · ESCO SBT 발행',  r: 8 },
+            { lat: 35.68, lng: 139.65, color: '#34d399', label: '도쿄 · K-Beauty 인증',  r: 6 },
+            { lat: 31.23, lng: 121.47, color: '#34d399', label: '상하이 · 정품인증 NFT', r: 6 },
+            { lat: 40.71, lng: -74.01, color: '#fcd34d', label: '뉴욕 · Bitcoin 각인',   r: 7 },
+            { lat: 48.86, lng:   2.35, color: '#f472b6', label: '파리 · VC 검증',         r: 6 },
+            { lat:  1.35, lng: 103.82, color: '#38bdf8', label: '싱가포르 · SBT',         r: 5 },
+            { lat: 25.20, lng:  55.27, color: '#fb923c', label: '두바이 · 글로벌 인증',   r: 5 },
+          ];
+
+          cities.forEach(c => {
+            const icon = L.divIcon({
+              className: '',
+              html: `<span style="display:block;width:${c.r*2}px;height:${c.r*2}px;border-radius:50%;
+                background:${c.color};box-shadow:0 0 0 0 ${c.color};
+                animation:leafletPulse 2s ease-out infinite;"></span>`,
+              iconSize: [c.r*2, c.r*2],
+              iconAnchor: [c.r, c.r],
+            });
+            L.marker([c.lat, c.lng], { icon }).addTo(map).bindTooltip(c.label, {
+              permanent: false, direction: 'top',
+              className: 'map-tooltip'
+            });
+          });
+        }
+        </script>
+        <style>
+          @keyframes leafletPulse {
+            0%   { box-shadow: 0 0 0 0 currentColor; }
+            70%  { box-shadow: 0 0 0 10px transparent; }
+            100% { box-shadow: 0 0 0 0 transparent; }
+          }
+          .leaflet-attribution-flag { display:none !important; }
+          .leaflet-control-attribution {
+            background: rgba(10,13,23,0.7) !important;
+            color: #4b5563 !important;
+            font-size: 9px !important;
+          }
+          .leaflet-control-attribution a { color: #4b5563 !important; }
+          .map-tooltip {
+            background: rgba(20,25,41,0.92) !important;
+            border: 1px solid rgba(124,58,237,0.4) !important;
+            color: #e2e8f0 !important;
+            font-size: 12px !important;
+            padding: 4px 10px !important;
+            border-radius: 6px !important;
+          }
+          .map-tooltip::before { border-top-color: rgba(124,58,237,0.4) !important; }
+        </style>
       </div>
 
       <!-- Trending brands -->
@@ -836,5 +893,6 @@
 </footer>
 
 <script src="assets/js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" onload="initWorldMap()"></script>
 </body>
 </html>
