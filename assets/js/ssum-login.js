@@ -125,7 +125,18 @@
 
   /* ── OTP 입력 처리 ──────────────────────────── */
   AwardAuth._otpInput = function (el, idx) {
-    el.value = el.value.replace(/\D/g, '').slice(-1);
+    // 붙여넣기 6자리 감지
+    const val = el.value.replace(/\D/g, '');
+    if (val.length >= 6) {
+      val.slice(0, 6).split('').forEach((c, i) => {
+        const inp = document.getElementById(`otp${i}`);
+        if (inp) inp.value = c;
+      });
+      document.getElementById('otp5')?.focus();
+      AwardAuth._verifyOTP();
+      return;
+    }
+    el.value = val.slice(-1);
     if (el.value && idx < 5) document.getElementById(`otp${idx+1}`)?.focus();
     if (idx === 5 && el.value) AwardAuth._verifyOTP();
   };
@@ -133,6 +144,21 @@
   AwardAuth._otpKey = function (e, idx) {
     if (e.key === 'Backspace' && !e.target.value && idx > 0) document.getElementById(`otp${idx-1}`)?.focus();
   };
+
+  /* ── 붙여넣기 이벤트 (전역) ─────────────────── */
+  document.addEventListener('paste', function (e) {
+    const step2 = document.getElementById('loginStep2');
+    if (!step2 || step2.style.display === 'none') return;
+    const digits = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+    if (!digits) return;
+    e.preventDefault();
+    digits.split('').forEach((c, i) => {
+      const inp = document.getElementById(`otp${i}`);
+      if (inp) inp.value = c;
+    });
+    document.getElementById(`otp${Math.min(digits.length, 5)}`)?.focus();
+    if (digits.length === 6) AwardAuth._verifyOTP();
+  });
 
   /* ── OTP 검증 ──────────────────────────────── */
   AwardAuth._verifyOTP = async function () {
@@ -148,7 +174,13 @@
         body: JSON.stringify({ session_token: _sessionToken, otp_code: code })
       });
       const verData = await verRes.json();
-      if (!verRes.ok || verData.status !== 'success') throw new Error(verData.message || '코드가 올바르지 않습니다');
+      if (!verRes.ok || verData.status !== 'success') {
+        const m = verData.message || '';
+        if (m.toLowerCase().includes('expired') || m.toLowerCase().includes('invalid')) {
+          throw new Error('인증코드가 올바르지 않거나 만료되었습니다.\n코드 재발송 후 다시 시도하세요.');
+        }
+        throw new Error(m || '코드가 올바르지 않습니다');
+      }
 
       const ssumToken = verData.user_token;
 
