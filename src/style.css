@@ -1,0 +1,141 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto+Mono:wght@400;500&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS 변수 (기존 디자인 토큰 유지) ── */
+:root {
+  --bg-0:     #060a18;
+  --bg-1:     #0c1024;
+  --bg-2:     #111830;
+  --bg-card:  #141929;
+  --bg-hover: #1a2035;
+  --border:   rgba(255,255,255,0.07);
+  --border-2: rgba(255,255,255,0.12);
+  --purple:   #7c3aed;
+  --purple-l: #a78bfa;
+  --pink:     #ec4899;
+  --gold:     #f59e0b;
+  --gold-l:   #fcd34d;
+  --green:    #10b981;
+  --green-l:  #34d399;
+  --red:      #ef4444;
+  --blue:     #3b82f6;
+  --text-1:   #ffffff;
+  --text-2:   #cbd5e1;
+  --text-3:   #64748b;
+  --text-4:   #475569;
+  --radius-sm:  6px;
+  --radius-md:  12px;
+  --radius-lg:  20px;
+  --radius-xl:  28px;
+}
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    @apply font-sans bg-bg-0 text-txt-1 antialiased overflow-x-hidden;
+    line-height: 1.6;
+  }
+  a { @apply text-inherit no-underline; }
+  img { @apply max-w-full block; }
+  button { cursor: pointer; }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg-1); }
+  ::-webkit-scrollbar-thumb { background: var(--purple); border-radius: 3px; }
+}
+
+@layer components {
+  .container { @apply max-w-[1280px] mx-auto px-6; }
+
+  /* ── 버튼 ── */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5
+           text-sm font-semibold rounded-md transition-all duration-200
+           cursor-pointer border-0 font-sans;
+  }
+  .btn-primary {
+    @apply btn bg-grad-purple text-white shadow-glow-purple
+           hover:opacity-90 hover:-translate-y-0.5;
+  }
+  .btn-outline {
+    @apply btn bg-transparent text-txt-2 border border-white/10
+           hover:border-primary hover:text-white;
+  }
+  .btn-gold {
+    @apply btn bg-grad-gold text-white shadow-glow-gold hover:opacity-90;
+  }
+  .btn-sm { @apply text-xs px-3 py-1.5; }
+
+  /* ── 배지 ── */
+  .badge {
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5
+           text-xs font-semibold rounded-full;
+  }
+  .badge-purple { @apply badge bg-primary/20 text-primary-light border border-primary/30; }
+  .badge-green  { @apply badge bg-success/15 text-success-light border border-success/25; }
+  .badge-gold   { @apply badge bg-gold/15 text-gold-light border border-gold/25; }
+  .badge-gray   { @apply badge bg-white/5 text-txt-3 border border-white/10; }
+  .badge-blue   { @apply badge bg-blue-500/15 text-blue-400 border border-blue-500/25; }
+
+  /* ── 카드 ── */
+  .card {
+    @apply bg-bg-card border border-white/[0.07] rounded-lg transition-all duration-200;
+  }
+  .card-hover { @apply card hover:border-primary/30 hover:shadow-glow-purple; }
+
+  /* ── 섹션 태그 ── */
+  .section-tag {
+    @apply inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold
+           tracking-widest uppercase text-primary-light
+           bg-primary/10 border border-primary/20 rounded-full mb-4;
+  }
+  .section-title {
+    @apply text-3xl font-extrabold text-txt-1 mb-3 leading-tight;
+  }
+  .section-title span { @apply bg-grad-hero bg-clip-text text-transparent; }
+
+  /* ── 오브 배경 ── */
+  .orb {
+    @apply absolute rounded-full blur-3xl pointer-events-none opacity-20;
+  }
+  .orb-purple { @apply bg-primary; }
+  .orb-gold   { @apply bg-gold; }
+
+  /* ── VC 해시 텍스트 ── */
+  .vc-hash {
+    @apply font-mono text-xs text-txt-3 break-all leading-relaxed;
+  }
+
+  /* ── Merkle 경로 ── */
+  .merkle-node {
+    @apply flex items-center gap-3 p-2.5 rounded-md bg-white/[0.03]
+           border border-white/5 mb-1.5;
+  }
+  .direction {
+    @apply w-6 h-6 flex-shrink-0 flex items-center justify-center
+           text-xs font-bold rounded-full;
+  }
+  .direction.L { @apply bg-primary/20 text-primary-light; }
+  .direction.R { @apply bg-success/20 text-success-light; }
+  .merkle-hash { @apply font-mono text-xs text-txt-3 truncate flex-1; }
+}
+
+@layer utilities {
+  .text-gradient { @apply bg-grad-hero bg-clip-text text-transparent; }
+  .glass {
+    @apply bg-white/[0.03] backdrop-blur-sm border border-white/[0.07];
+  }
+  .animate-ticker { animation: ticker 30s linear infinite; }
+}
+
+@keyframes ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-12px); }
+}
