@@ -575,9 +575,12 @@
         }
 
         // 인증 자산 (이미지/영상만, 최대 4개)
-        const assetsRes = await fetch(`${API}/brands/esco/assets?limit=12`);
+        const assetsRes = await fetch(`${API}/brands/esco/assets?limit=20`);
         const assetsData = await assetsRes.json();
+        // 정렬: 모델 → 로고 → 상품 → 영상
+        const SORT = { model_portrait:0, brand_logo:1, product_design:2, brand_video:3 };
         const assets = (assetsData.assets || [])
+          .sort((a, b) => (SORT[a.asset_class] ?? 4) - (SORT[b.asset_class] ?? 4))
           .slice(0, 4);
 
         const grid = document.getElementById('escoAssetGrid');

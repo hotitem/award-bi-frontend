@@ -78,7 +78,7 @@
 
         <div class="brand-stats">
           <div>
-            <div class="brand-stat-val">11</div>
+            <div class="brand-stat-val brand-stat-sbt">11</div>
             <div class="brand-stat-lbl">SBT 발행</div>
           </div>
           <div>
@@ -98,7 +98,7 @@
         <!-- Tabs -->
         <div class="brand-tabs">
           <button class="tab-btn active" onclick="switchTab('all', this)">전체</button>
-          <button class="tab-btn" onclick="switchTab('sbt', this)">SBT (11)</button>
+          <button class="tab-btn sbt-tab-btn" onclick="switchTab('sbt', this)">SBT (11)</button>
           <button class="tab-btn" onclick="switchTab('nft', this)">NFT</button>
           <button class="tab-btn" onclick="switchTab('cert', this)">정품인증</button>
         </div>
@@ -150,331 +150,137 @@
 
     <!-- Filter -->
     <div class="filter-bar">
-      <button class="filter-btn active" onclick="filterAssets('all', this)">전체 (11+1,000)</button>
+      <button class="filter-btn active filter-all-btn" onclick="filterAssets('all', this)">전체 (11+1,000)</button>
       <button class="filter-btn" onclick="filterAssets('sbt_design', this)">🏷️ 상품 디자인</button>
       <button class="filter-btn" onclick="filterAssets('sbt_model', this)">👤 모델 · AI</button>
-      <button class="filter-btn" onclick="filterAssets('sbt_logo', this)">🔒 로고 · 명함</button>
+      <button class="filter-btn" onclick="filterAssets('sbt_logo', this)">🔒 로고</button>
+      <button class="filter-btn" onclick="filterAssets('sbt_video', this)">🎬 영상</button>
       <button class="filter-btn" onclick="filterAssets('nft', this)">🎖️ 정품인증 NFT</button>
       <button class="filter-btn" onclick="filterAssets('verified', this)">⭐ award.bi 인증</button>
     </div>
 
-    <!-- Asset Grid -->
+    <!-- Asset Grid — API 동적 로딩 (Cloudflare R2 실제 이미지) -->
     <div class="asset-grid" id="assetGrid">
-
-      <!-- 1: Jeju Tangerine Cream -->
-      <div class="asset-card" data-type="sbt_design">
-        <div class="asset-card-img">
-          <div class="asset-img-bg" style="background:linear-gradient(145deg,#4a2800,#8b5e00);"></div>
-          <div class="asset-img-content">
-            🍊
-            <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:8px;text-align:center;">Vita Cream</div>
-          </div>
-          <div class="asset-type-badge"><span class="tag tag-design">상품 디자인</span></div>
-          <div class="asset-chain-badge">
-            <div class="asset-sbt-tag">⭐ SBT 인증</div>
-            <a href="https://opensea.io" class="opensea-link" target="_blank">OpenSea ↗</a>
-          </div>
-        </div>
-        <div class="asset-card-body">
-          <div class="asset-card-name">Jeju Tangerine Vita Cream</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
-            <span class="badge badge-purple" style="font-size:10px;">⭐ SBT</span>
-            <span class="badge badge-gold" style="font-size:10px;">⚓ 각인</span>
-          </div>
-          <div class="asset-card-actions">
-            <a href="/verify.html?id=vc-esco-001" class="btn btn-primary btn-sm">🔍 SBT 보기</a>
-            <button class="btn btn-outline btn-sm" onclick="copyLink('vc-esco-001')">원본</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 2: Elin AI Model — Kei 공식인증 -->
-      <div class="asset-card" data-type="sbt_model verified">
-        <div class="asset-card-img">
-          <div class="asset-img-bg" style="background:linear-gradient(145deg,#1a0a2e,#3d1080);"></div>
-          <div class="asset-img-content">👩</div>
-          <div class="asset-type-badge"><span class="tag tag-model">모델 · AI</span></div>
-          <a class="asset-verified-badge" href="https://award.bi/verify.html" target="_blank" style="display:flex;align-items:center;gap:3px;background:linear-gradient(135deg,rgba(124,58,237,0.92),rgba(79,70,229,0.92));border-radius:6px;padding:3px 7px;text-decoration:none;"><span style="font-size:10px;">⭐</span><span style="font-size:9px;font-weight:800;color:#fff;">award.bi</span></a>
-          <div class="asset-chain-badge">
-            <div class="asset-sbt-tag">⭐ SBT 인증</div>
-            <a href="https://opensea.io" class="opensea-link" target="_blank">OpenSea ↗</a>
-          </div>
-        </div>
-        <div class="asset-card-body">
-          <div class="asset-card-name">Elin — AI Model</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
-            <span style="display:inline-flex;align-items:center;gap:2px;padding:3px 7px;border-radius:100px;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;font-size:10px;font-weight:800;">⭐ award.bi</span>
-            <span class="badge badge-purple" style="font-size:10px;">⭐ SBT</span>
-            <span class="badge badge-gold" style="font-size:10px;">⚓ 각인</span>
-          </div>
-          <div class="asset-card-actions">
-            <a href="/verify.html?id=vc-esco-002" class="btn btn-primary btn-sm">🔍 SBT 보기</a>
-            <button class="btn btn-outline btn-sm" onclick="copyLink('vc-esco-002')">원본</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 3: B5 Cream — Kei 공식인증 -->
-      <div class="asset-card" data-type="sbt_design verified">
-        <div class="asset-card-img">
-          <div class="asset-img-bg" style="background:linear-gradient(145deg,#001a35,#003580);"></div>
-          <div class="asset-img-content">
-            💙
-            <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:8px;text-align:center;">B5 Barrier Cream</div>
-          </div>
-          <div class="asset-type-badge"><span class="tag tag-design">상품 디자인</span></div>
-          <a class="asset-verified-badge" href="https://award.bi/verify.html" target="_blank" style="display:flex;align-items:center;gap:3px;background:linear-gradient(135deg,rgba(124,58,237,0.92),rgba(79,70,229,0.92));border-radius:6px;padding:3px 7px;text-decoration:none;"><span style="font-size:10px;">⭐</span><span style="font-size:9px;font-weight:800;color:#fff;">award.bi</span></a>
-          <div class="asset-chain-badge">
-            <div class="asset-sbt-tag">⭐ SBT 인증</div>
-            <a href="https://opensea.io" class="opensea-link" target="_blank">OpenSea ↗</a>
-          </div>
-        </div>
-        <div class="asset-card-body">
-          <div class="asset-card-name">B5 Barrier Cream</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
-            <span style="display:inline-flex;align-items:center;gap:2px;padding:3px 7px;border-radius:100px;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;font-size:10px;font-weight:800;">⭐ award.bi</span>
-            <span class="badge badge-purple" style="font-size:10px;">⭐ SBT</span>
-          </div>
-          <div class="asset-card-actions">
-            <a href="/verify.html?id=vc-esco-003" class="btn btn-primary btn-sm">🔍 SBT 보기</a>
-            <button class="btn btn-outline btn-sm" onclick="copyLink('vc-esco-003')">원본</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 4: ESCO 로고 -->
-      <div class="asset-card" data-type="sbt_logo">
-        <div class="asset-card-img">
-          <div class="asset-img-bg" style="background:linear-gradient(145deg,#3b0764,#7c3aed);"></div>
-          <div class="asset-img-content">
-            🧴
-            <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:8px;text-align:center;">Brand Logo</div>
-          </div>
-          <div class="asset-type-badge"><span class="tag tag-logo">로고</span></div>
-          <div class="asset-chain-badge">
-            <div class="asset-sbt-tag">⭐ SBT 인증</div>
-          </div>
-        </div>
-        <div class="asset-card-body">
-          <div class="asset-card-name">ESCO 로고</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
-            <span class="badge badge-purple" style="font-size:10px;">⭐ SBT</span>
-          </div>
-          <div class="asset-card-actions">
-            <a href="/verify.html?id=vc-esco-logo" class="btn btn-primary btn-sm">🔍 SBT 보기</a>
-            <button class="btn btn-outline btn-sm" onclick="copyLink('vc-esco-logo')">원본</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 5: Tangerine Ample -->
-      <div class="asset-card" data-type="sbt_design">
-        <div class="asset-card-img">
-          <div class="asset-img-bg" style="background:linear-gradient(145deg,#3a1800,#6b3500);"></div>
-          <div class="asset-img-content">
-            🌿
-            <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:8px;text-align:center;">Vita Serum</div>
-          </div>
-          <div class="asset-type-badge"><span class="tag tag-design">상품 디자인</span></div>
-          <div class="asset-chain-badge">
-            <div class="asset-sbt-tag">⭐ SBT 인증</div>
-            <a href="https://opensea.io" class="opensea-link" target="_blank">OpenSea ↗</a>
-          </div>
-        </div>
-        <div class="asset-card-body">
-          <div class="asset-card-name">Juju Tangerine Vita Serum</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
-            <span class="badge badge-purple" style="font-size:10px;">⭐ SBT</span>
-            <span class="badge badge-gold" style="font-size:10px;">⚓ 각인</span>
-          </div>
-          <div class="asset-card-actions">
-            <a href="/verify.html?id=vc-esco-005" class="btn btn-primary btn-sm">🔍 SBT 보기</a>
-            <button class="btn btn-outline btn-sm" onclick="copyLink('vc-esco-005')">원본</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 6: Cica Cream -->
-      <div class="asset-card" data-type="sbt_design">
-        <div class="asset-card-img">
-          <div class="asset-img-bg" style="background:linear-gradient(145deg,#0a1f0a,#1a3d1a);"></div>
-          <div class="asset-img-content">
-            🌱
-            <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:8px;text-align:center;">CICA Calming</div>
-          </div>
-          <div class="asset-type-badge"><span class="tag tag-design">상품 디자인</span></div>
-          <div class="asset-chain-badge">
-            <div class="asset-sbt-tag">⭐ SBT 인증</div>
-            <a href="https://opensea.io" class="opensea-link" target="_blank">OpenSea ↗</a>
-          </div>
-        </div>
-        <div class="asset-card-body">
-          <div class="asset-card-name">CICA Calming Cream</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
-            <span class="badge badge-purple" style="font-size:10px;">⭐ SBT</span>
-          </div>
-          <div class="asset-card-actions">
-            <a href="/verify.html?id=vc-esco-006" class="btn btn-primary btn-sm">🔍 SBT 보기</a>
-            <button class="btn btn-outline btn-sm" onclick="copyLink('vc-esco-006')">원본</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 7: PDRN Cream — Kei 공식인증 -->
-      <div class="asset-card" data-type="sbt_design verified">
-        <div class="asset-card-img">
-          <div class="asset-img-bg" style="background:linear-gradient(145deg,#3d0a0a,#7a2020);"></div>
-          <div class="asset-img-content">
-            🌸
-            <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:8px;text-align:center;">PDRN Cream</div>
-          </div>
-          <div class="asset-type-badge"><span class="tag tag-design">상품 디자인</span></div>
-          <a class="asset-verified-badge" href="https://award.bi/verify.html" target="_blank" style="display:flex;align-items:center;gap:3px;background:linear-gradient(135deg,rgba(124,58,237,0.92),rgba(79,70,229,0.92));border-radius:6px;padding:3px 7px;text-decoration:none;"><span style="font-size:10px;">⭐</span><span style="font-size:9px;font-weight:800;color:#fff;">award.bi</span></a>
-          <div class="asset-chain-badge">
-            <div class="asset-sbt-tag">⭐ SBT 인증</div>
-            <a href="https://opensea.io" class="opensea-link" target="_blank">OpenSea ↗</a>
-          </div>
-        </div>
-        <div class="asset-card-body">
-          <div class="asset-card-name">PDRN Renewal Cream</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
-            <span style="display:inline-flex;align-items:center;gap:2px;padding:3px 7px;border-radius:100px;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;font-size:10px;font-weight:800;">⭐ award.bi</span>
-            <span class="badge badge-purple" style="font-size:10px;">⭐ SBT</span>
-          </div>
-          <div class="asset-card-actions">
-            <a href="/verify.html?id=vc-esco-007" class="btn btn-primary btn-sm">🔍 SBT 보기</a>
-            <button class="btn btn-outline btn-sm" onclick="copyLink('vc-esco-007')">원본</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 8: PDRN Ampoule -->
-      <div class="asset-card" data-type="sbt_design">
-        <div class="asset-card-img">
-          <div class="asset-img-bg" style="background:linear-gradient(145deg,#1a0028,#3d0060);"></div>
-          <div class="asset-img-content">
-            💜
-            <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:8px;text-align:center;">PDRN Ampoule</div>
-          </div>
-          <div class="asset-type-badge"><span class="tag tag-design">상품 디자인</span></div>
-          <div class="asset-chain-badge">
-            <div class="asset-sbt-tag">⭐ SBT 인증</div>
-          </div>
-        </div>
-        <div class="asset-card-body">
-          <div class="asset-card-name">PDRN Renewal Ampoule</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
-            <span class="badge badge-purple" style="font-size:10px;">⭐ SBT</span>
-          </div>
-          <div class="asset-card-actions">
-            <a href="/verify.html?id=vc-esco-008" class="btn btn-primary btn-sm">🔍 SBT 보기</a>
-            <button class="btn btn-outline btn-sm" onclick="copyLink('vc-esco-008')">원본</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 9: CICA Serum -->
-      <div class="asset-card" data-type="sbt_design">
-        <div class="asset-card-img">
-          <div class="asset-img-bg" style="background:linear-gradient(145deg,#001a10,#003d20);"></div>
-          <div class="asset-img-content">
-            🌿
-            <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:8px;text-align:center;">CICA Serum</div>
-          </div>
-          <div class="asset-type-badge"><span class="tag tag-design">상품 디자인</span></div>
-          <div class="asset-chain-badge">
-            <div class="asset-sbt-tag">⭐ SBT 인증</div>
-          </div>
-        </div>
-        <div class="asset-card-body">
-          <div class="asset-card-name">CICA Calming Serum</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
-            <span class="badge badge-purple" style="font-size:10px;">⭐ SBT</span>
-          </div>
-          <div class="asset-card-actions">
-            <a href="/verify.html?id=vc-esco-009" class="btn btn-primary btn-sm">🔍 SBT 보기</a>
-            <button class="btn btn-outline btn-sm" onclick="copyLink('vc-esco-009')">원본</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 10: B5 Ampoule -->
-      <div class="asset-card" data-type="sbt_design">
-        <div class="asset-card-img">
-          <div class="asset-img-bg" style="background:linear-gradient(145deg,#001535,#002870);"></div>
-          <div class="asset-img-content">
-            💙
-            <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:8px;text-align:center;">B5 Ampoule</div>
-          </div>
-          <div class="asset-type-badge"><span class="tag tag-design">상품 디자인</span></div>
-          <div class="asset-chain-badge">
-            <div class="asset-sbt-tag">⭐ SBT 인증</div>
-          </div>
-        </div>
-        <div class="asset-card-body">
-          <div class="asset-card-name">B5 Barrier Ampoule</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
-            <span class="badge badge-purple" style="font-size:10px;">⭐ SBT</span>
-          </div>
-          <div class="asset-card-actions">
-            <a href="/verify.html?id=vc-esco-010" class="btn btn-primary btn-sm">🔍 SBT 보기</a>
-            <button class="btn btn-outline btn-sm" onclick="copyLink('vc-esco-010')">원본</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 11: 브랜드 영상 -->
-      <div class="asset-card" data-type="sbt_design">
-        <div class="asset-card-img">
-          <div class="asset-img-bg" style="background:linear-gradient(145deg,#1a0a2e,#3d1080);"></div>
-          <div class="asset-img-content">
-            🎬
-            <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:8px;text-align:center;">Brand Video</div>
-          </div>
-          <div class="asset-type-badge"><span class="tag tag-model">영상</span></div>
-          <div class="asset-chain-badge">
-            <div class="asset-sbt-tag">⭐ SBT 인증</div>
-          </div>
-        </div>
-        <div class="asset-card-body">
-          <div class="asset-card-name">브랜드 영상</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
-            <span class="badge badge-purple" style="font-size:10px;">⭐ SBT</span>
-          </div>
-          <div class="asset-card-actions">
-            <a href="/verify.html?id=vc-esco-011" class="btn btn-primary btn-sm">🔍 SBT 보기</a>
-            <button class="btn btn-outline btn-sm" onclick="copyLink('vc-esco-011')">원본</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 12: NFT 정품인증 (구매 필요) -->
-      <div class="asset-card" data-type="nft" style="border-color:rgba(245,158,11,0.3);">
-        <div class="asset-card-img">
-          <div class="asset-img-bg" style="background:linear-gradient(145deg,#1a1000,#2d2000);"></div>
-          <div class="asset-img-content">
-            🎖️
-            <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:8px;text-align:center;">정품인증 NFT</div>
-          </div>
-          <div class="asset-type-badge"><span class="tag tag-cert">🎖️ 정품인증 NFT</span></div>
-          <div style="position:absolute;top:12px;right:12px;background:rgba(245,158,11,0.9);padding:4px 10px;border-radius:100px;font-size:11px;font-weight:700;color:#000;">한정 발행</div>
-          <div class="asset-chain-badge">
-            <div style="display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:100px;background:rgba(20,25,41,0.85);backdrop-filter:blur(8px);border:1px solid rgba(245,158,11,0.4);font-size:11px;font-weight:700;color:var(--gold-l);">🎖️ NFT</div>
-          </div>
-        </div>
-        <div class="asset-card-body">
-          <div class="asset-card-name">ESCO 정품인증서 NFT</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
-            <span class="badge badge-gold" style="font-size:10px;">🎖️ NFT · 양도가능</span>
-          </div>
-          <div style="font-size:12px;color:var(--text-3);margin-bottom:10px;">구매·리뷰 완료 시 자동 지급</div>
-          <div class="asset-card-actions">
-            <a href="https://kei.bio/esco" class="btn btn-gold btn-sm" target="_blank">🛒 구매하기</a>
-          </div>
-        </div>
-      </div>
-
+      <div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text-4);">⏳ 자산 로딩 중...</div>
     </div>
+    <script>
+    (async function loadEscoAssets() {
+      const API = 'https://api.award.bi';
+      const LABEL = {
+        brand_logo:'로고', product_design:'상품 디자인',
+        model_portrait:'모델 · AI', brand_video:'영상', brand_identity:'브랜드'
+      };
+      const TAG_CLS = {
+        brand_logo:'tag-logo', product_design:'tag-design',
+        model_portrait:'tag-model', brand_video:'tag-video'
+      };
+      const FILTER_TYPE = {
+        brand_logo:'sbt_logo', product_design:'sbt_design',
+        model_portrait:'sbt_model', brand_video:'sbt_video'
+      };
+      const SORT_ORDER = { model_portrait:0, brand_logo:1, product_design:2, brand_video:3 };
+      const grid = document.getElementById('assetGrid');
+
+      try {
+        // 브랜드 통계 업데이트
+        const brandRes = await fetch(`${API}/brands/esco`);
+        const brandData = await brandRes.json();
+        if (brandData.ok) {
+          const sbt = brandData.brand.sbt_count || 0;
+          const statEl = document.querySelector('.brand-stat-sbt');
+          if (statEl) statEl.textContent = sbt;
+          const tabEl = document.querySelector('.sbt-tab-btn');
+          if (tabEl) tabEl.textContent = 'SBT (' + sbt + ')';
+          const allBtn = document.querySelector('.filter-all-btn');
+          if (allBtn) allBtn.textContent = '전체 (' + sbt + '+1,000)';
+        }
+
+        // 자산 목록 로딩
+        const assetsRes = await fetch(`${API}/brands/esco/assets?limit=20`);
+        const assetsData = await assetsRes.json();
+        const assets = assetsData.assets || [];
+
+        // 정렬: 모델 → 로고 → 상품디자인 → 영상
+        assets.sort((a, b) => (SORT_ORDER[a.asset_class] ?? 4) - (SORT_ORDER[b.asset_class] ?? 4));
+
+        if (!assets.length) {
+          grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text-4);">등록된 자산이 없습니다.</div>';
+          return;
+        }
+
+        const IS = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;';
+
+        const cards = assets.map(a => {
+          const meta = a.asset_metadata || {};
+          const isVideo = a.asset_class === 'brand_video' || /\.(mp4|webm|mov)/i.test(a.source_url || '');
+          const title = (meta.title && meta.title !== a.asset_class)
+            ? meta.title
+            : (a.asset_class === 'brand_video' ? '브랜드 영상' : (LABEL[a.asset_class] || a.asset_class));
+          const tagCls   = TAG_CLS[a.asset_class]    || 'tag-design';
+          const tagLabel = LABEL[a.asset_class]       || a.asset_class;
+          const dataType = FILTER_TYPE[a.asset_class] || 'sbt_design';
+          const isCert   = Boolean(a.atelier_approved_at);
+          const vcLink   = a.vc_id ? ('/verify.html?id=' + a.vc_id) : '/verify.html';
+
+          const media = isVideo
+            ? `<video src="${a.source_url}" muted autoplay loop playsinline style="${IS}" onerror="this.remove()"></video>`
+            : `<img src="${a.source_url}" alt="${title}" loading="lazy" style="${IS}" onerror="this.remove()">`;
+
+          const awardBadge = isCert
+            ? `<a href="${vcLink}" target="_blank" style="position:absolute;top:8px;right:8px;display:flex;align-items:center;gap:3px;padding:3px 7px;border-radius:6px;background:linear-gradient(135deg,rgba(124,58,237,0.92),rgba(79,70,229,0.92));text-decoration:none;"><span style="font-size:10px;">⭐</span><span style="font-size:9px;font-weight:800;color:#fff;">award.bi</span></a>` : '';
+
+          const statusBadge = isCert
+            ? `<span class="badge badge-gold" style="font-size:10px;">⚓ 각인</span>`
+            : `<span class="badge badge-gold" style="font-size:10px;">⏳ 심사중</span>`;
+
+          const actions = a.vc_id
+            ? `<a href="${vcLink}" class="btn btn-primary btn-sm">🔍 SBT 보기</a><button class="btn btn-outline btn-sm" onclick="navigator.clipboard.writeText('${vcLink}').then(()=>alert('링크 복사!'))">원본</button>`
+            : `<span style="font-size:12px;color:var(--text-3);">아뜰리에 심사 중</span>`;
+
+          return `
+<div class="asset-card" data-type="${dataType}${isCert ? ' verified' : ''}">
+  <div class="asset-card-img" style="position:relative;min-height:200px;background:#1a1a2e;">
+    ${media}
+    <div class="asset-type-badge"><span class="tag ${tagCls}">${tagLabel}</span></div>
+    ${awardBadge}
+    <div class="asset-chain-badge"><div class="asset-sbt-tag">⭐ SBT 인증</div></div>
+  </div>
+  <div class="asset-card-body">
+    <div class="asset-card-name">${title}</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+      ${isCert ? `<span style="display:inline-flex;align-items:center;gap:2px;padding:3px 7px;border-radius:100px;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;font-size:10px;font-weight:800;">⭐ award.bi</span>` : ''}
+      <span class="badge badge-purple" style="font-size:10px;">⭐ SBT</span>
+      ${statusBadge}
+    </div>
+    <div class="asset-card-actions">${actions}</div>
+  </div>
+</div>`;
+        }).join('');
+
+        const nftCard = `
+<div class="asset-card" data-type="nft" style="border-color:rgba(245,158,11,0.3);">
+  <div class="asset-card-img" style="position:relative;">
+    <div class="asset-img-bg" style="background:linear-gradient(145deg,#1a1000,#2d2000);"></div>
+    <div class="asset-img-content">🎖️<div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:8px;text-align:center;">정품인증 NFT</div></div>
+    <div class="asset-type-badge"><span class="tag tag-cert">🎖️ 정품인증 NFT</span></div>
+    <div style="position:absolute;top:12px;right:12px;background:rgba(245,158,11,0.9);padding:4px 10px;border-radius:100px;font-size:11px;font-weight:700;color:#000;">한정 발행</div>
+    <div class="asset-chain-badge"><div style="display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:100px;background:rgba(20,25,41,0.85);backdrop-filter:blur(8px);border:1px solid rgba(245,158,11,0.4);font-size:11px;font-weight:700;color:var(--gold-l);">🎖️ NFT</div></div>
+  </div>
+  <div class="asset-card-body">
+    <div class="asset-card-name">ESCO 정품인증서 NFT</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;"><span class="badge badge-gold" style="font-size:10px;">🎖️ NFT · 양도가능</span></div>
+    <div style="font-size:12px;color:var(--text-3);margin-bottom:10px;">구매·리뷰 완료 시 자동 지급</div>
+    <div class="asset-card-actions"><a href="https://kei.bio/esco" class="btn btn-gold btn-sm" target="_blank">🛒 구매하기</a></div>
+  </div>
+</div>`;
+
+        grid.innerHTML = cards + nftCard;
+      } catch(e) {
+        console.warn('[esco-assets]', e.message);
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text-4);">⚠️ 자산 로딩 실패 — 새로고침 해주세요</div>';
+      }
+    })();
+    </script>
 
     <!-- Bitcoin Inscription History -->
     <div style="margin-top:48px;">
