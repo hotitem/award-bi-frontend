@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESCO Beauty — award.bi 인증 브랜드</title>
-  <meta name="description" content="ESCO Beauty의 SBT·NFT 인증 자산. kei.bio/esco 공식 인증 · Bitcoin 각인 완료.">
+  <title>ESCO Cosmetics — award.bi 인증 브랜드</title>
+  <meta name="description" content="ESCO Cosmetics의 SBT·NFT 인증 자산. kei.bio/esco 공식 인증 · Bitcoin 각인 완료.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%237c3aed'/><text y='22' x='5' font-size='18'>⭐</text></svg>">
   <link rel="stylesheet" href="../assets/css/style.css">
   <style>
@@ -66,7 +66,7 @@
         </div>
 
         <div class="brand-name-row">
-          <h1 class="brand-name">ESCO Beauty</h1>
+          <h1 class="brand-name">ESCO Cosmetics</h1>
           <span style="display:inline-flex;align-items:center;gap:3px;padding:4px 10px;border-radius:100px;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;font-size:12px;font-weight:800;">⭐ award.bi 인증</span>
           <span class="badge badge-purple" style="font-size:12px;">⭐ 아뜰리에 승인</span>
         </div>
@@ -78,7 +78,7 @@
 
         <div class="brand-stats">
           <div>
-            <div class="brand-stat-val">7</div>
+            <div class="brand-stat-val">11</div>
             <div class="brand-stat-lbl">SBT 발행</div>
           </div>
           <div>
@@ -98,7 +98,7 @@
         <!-- Tabs -->
         <div class="brand-tabs">
           <button class="tab-btn active" onclick="switchTab('all', this)">전체</button>
-          <button class="tab-btn" onclick="switchTab('sbt', this)">SBT (7)</button>
+          <button class="tab-btn" onclick="switchTab('sbt', this)">SBT (11)</button>
           <button class="tab-btn" onclick="switchTab('nft', this)">NFT</button>
           <button class="tab-btn" onclick="switchTab('cert', this)">정품인증</button>
         </div>
@@ -150,7 +150,7 @@
 
     <!-- Filter -->
     <div class="filter-bar">
-      <button class="filter-btn active" onclick="filterAssets('all', this)">전체 (7+1,000)</button>
+      <button class="filter-btn active" onclick="filterAssets('all', this)">전체 (11+1,000)</button>
       <button class="filter-btn" onclick="filterAssets('sbt_design', this)">🏷️ 상품 디자인</button>
       <button class="filter-btn" onclick="filterAssets('sbt_model', this)">👤 모델 · AI</button>
       <button class="filter-btn" onclick="filterAssets('sbt_logo', this)">🔒 로고 · 명함</button>
@@ -242,26 +242,27 @@
         </div>
       </div>
 
-      <!-- 4: 로고·명함 — LOCKED -->
+      <!-- 4: ESCO 로고 -->
       <div class="asset-card" data-type="sbt_logo">
         <div class="asset-card-img">
-          <div class="asset-img-bg" style="background:linear-gradient(145deg,#0f172a,#1e293b);filter:blur(6px);"></div>
-          <div class="lock-overlay">
-            <div class="lock-icon">🔒</div>
-            <div class="lock-title">명함 이미지 잠금</div>
-            <div class="lock-sub">맞팔 회원만 열람 가능<br>로그인 후 요청 가능</div>
-            <a href="https://kei.bio/login" class="btn btn-primary btn-sm" target="_blank">로그인 →</a>
+          <div class="asset-img-bg" style="background:linear-gradient(145deg,#3b0764,#7c3aed);"></div>
+          <div class="asset-img-content">
+            🧴
+            <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:8px;text-align:center;">Brand Logo</div>
           </div>
-          <div class="asset-type-badge"><span class="tag tag-logo">로고 · 명함</span></div>
+          <div class="asset-type-badge"><span class="tag tag-logo">로고</span></div>
+          <div class="asset-chain-badge">
+            <div class="asset-sbt-tag">⭐ SBT 인증</div>
+          </div>
         </div>
         <div class="asset-card-body">
-          <div class="asset-card-name" style="color:var(--text-4);">ESCO 로고 · 명함</div>
-          <div style="margin-bottom:10px;">
-            <span class="badge badge-gray" style="font-size:10px;">🔒 잠금</span>
-            <span class="badge badge-purple" style="font-size:10px;margin-left:4px;">⭐ SBT</span>
+          <div class="asset-card-name">ESCO 로고</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+            <span class="badge badge-purple" style="font-size:10px;">⭐ SBT</span>
           </div>
           <div class="asset-card-actions">
-            <a href="https://kei.bio/login" class="btn btn-outline btn-sm" target="_blank">로그인 →</a>
+            <a href="/verify.html?id=vc-esco-logo" class="btn btn-primary btn-sm">🔍 SBT 보기</a>
+            <button class="btn btn-outline btn-sm" onclick="copyLink('vc-esco-logo')">원본</button>
           </div>
         </div>
       </div>
@@ -347,7 +348,107 @@
         </div>
       </div>
 
-      <!-- 8: NFT 정품인증 (구매 필요) -->
+      <!-- 8: PDRN Ampoule -->
+      <div class="asset-card" data-type="sbt_design">
+        <div class="asset-card-img">
+          <div class="asset-img-bg" style="background:linear-gradient(145deg,#1a0028,#3d0060);"></div>
+          <div class="asset-img-content">
+            💜
+            <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:8px;text-align:center;">PDRN Ampoule</div>
+          </div>
+          <div class="asset-type-badge"><span class="tag tag-design">상품 디자인</span></div>
+          <div class="asset-chain-badge">
+            <div class="asset-sbt-tag">⭐ SBT 인증</div>
+          </div>
+        </div>
+        <div class="asset-card-body">
+          <div class="asset-card-name">PDRN Renewal Ampoule</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+            <span class="badge badge-purple" style="font-size:10px;">⭐ SBT</span>
+          </div>
+          <div class="asset-card-actions">
+            <a href="/verify.html?id=vc-esco-008" class="btn btn-primary btn-sm">🔍 SBT 보기</a>
+            <button class="btn btn-outline btn-sm" onclick="copyLink('vc-esco-008')">원본</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 9: CICA Serum -->
+      <div class="asset-card" data-type="sbt_design">
+        <div class="asset-card-img">
+          <div class="asset-img-bg" style="background:linear-gradient(145deg,#001a10,#003d20);"></div>
+          <div class="asset-img-content">
+            🌿
+            <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:8px;text-align:center;">CICA Serum</div>
+          </div>
+          <div class="asset-type-badge"><span class="tag tag-design">상품 디자인</span></div>
+          <div class="asset-chain-badge">
+            <div class="asset-sbt-tag">⭐ SBT 인증</div>
+          </div>
+        </div>
+        <div class="asset-card-body">
+          <div class="asset-card-name">CICA Calming Serum</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+            <span class="badge badge-purple" style="font-size:10px;">⭐ SBT</span>
+          </div>
+          <div class="asset-card-actions">
+            <a href="/verify.html?id=vc-esco-009" class="btn btn-primary btn-sm">🔍 SBT 보기</a>
+            <button class="btn btn-outline btn-sm" onclick="copyLink('vc-esco-009')">원본</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 10: B5 Ampoule -->
+      <div class="asset-card" data-type="sbt_design">
+        <div class="asset-card-img">
+          <div class="asset-img-bg" style="background:linear-gradient(145deg,#001535,#002870);"></div>
+          <div class="asset-img-content">
+            💙
+            <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:8px;text-align:center;">B5 Ampoule</div>
+          </div>
+          <div class="asset-type-badge"><span class="tag tag-design">상품 디자인</span></div>
+          <div class="asset-chain-badge">
+            <div class="asset-sbt-tag">⭐ SBT 인증</div>
+          </div>
+        </div>
+        <div class="asset-card-body">
+          <div class="asset-card-name">B5 Barrier Ampoule</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+            <span class="badge badge-purple" style="font-size:10px;">⭐ SBT</span>
+          </div>
+          <div class="asset-card-actions">
+            <a href="/verify.html?id=vc-esco-010" class="btn btn-primary btn-sm">🔍 SBT 보기</a>
+            <button class="btn btn-outline btn-sm" onclick="copyLink('vc-esco-010')">원본</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 11: 브랜드 영상 -->
+      <div class="asset-card" data-type="sbt_design">
+        <div class="asset-card-img">
+          <div class="asset-img-bg" style="background:linear-gradient(145deg,#1a0a2e,#3d1080);"></div>
+          <div class="asset-img-content">
+            🎬
+            <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:8px;text-align:center;">Brand Video</div>
+          </div>
+          <div class="asset-type-badge"><span class="tag tag-model">영상</span></div>
+          <div class="asset-chain-badge">
+            <div class="asset-sbt-tag">⭐ SBT 인증</div>
+          </div>
+        </div>
+        <div class="asset-card-body">
+          <div class="asset-card-name">브랜드 영상</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+            <span class="badge badge-purple" style="font-size:10px;">⭐ SBT</span>
+          </div>
+          <div class="asset-card-actions">
+            <a href="/verify.html?id=vc-esco-011" class="btn btn-primary btn-sm">🔍 SBT 보기</a>
+            <button class="btn btn-outline btn-sm" onclick="copyLink('vc-esco-011')">원본</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 12: NFT 정품인증 (구매 필요) -->
       <div class="asset-card" data-type="nft" style="border-color:rgba(245,158,11,0.3);">
         <div class="asset-card-img">
           <div class="asset-img-bg" style="background:linear-gradient(145deg,#1a1000,#2d2000);"></div>
@@ -416,7 +517,7 @@
       <div>
         <a href="/" style="color:var(--purple-l);font-weight:700;">⭐ award.bi</a>
         <span style="color:var(--text-4);margin:0 12px;">—</span>
-        <span style="color:var(--text-4);">ESCO Beauty · © 2025 Powered by kei.bio</span>
+        <span style="color:var(--text-4);">ESCO Cosmetics · © 2025 Powered by kei.bio</span>
       </div>
       <div class="footer-badges">
         <a href="https://kei.bio/esco" target="_blank" class="badge badge-purple">🔗 kei.bio/esco ↗</a>

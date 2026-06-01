@@ -375,8 +375,8 @@
             <div class="trending-rank top">1</div>
             <div class="trending-logo" style="background:linear-gradient(135deg,#7c3aed,#4f46e5);">🧴</div>
             <div class="trending-info">
-              <div class="trending-name">ESCO</div>
-              <div class="trending-sub">SBT 7건 인증</div>
+              <div class="trending-name">ESCO Cosmetics</div>
+              <div class="trending-sub">SBT 11건 인증</div>
             </div>
             <div class="trending-change">+12.4%</div>
           </div>
@@ -575,11 +575,10 @@
         }
 
         // 인증 자산 (이미지/영상만, 최대 4개)
-        const assetsRes = await fetch(`${API}/brands/esco/assets?status=vc_issued&limit=8`);
+        const assetsRes = await fetch(`${API}/brands/esco/assets?limit=12`);
         const assetsData = await assetsRes.json();
         const assets = (assetsData.assets || [])
-          .filter(a => a.asset_class !== 'brand_logo') // 로고·명함은 잠금 처리
-          .slice(0, 3);
+          .slice(0, 4);
 
         const grid = document.getElementById('escoAssetGrid');
         if (!assets.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-4);">인증 자산 없음</div>'; return; }
@@ -628,25 +627,7 @@
 </div>`;
         }).join('');
 
-        // 로고 잠금 카드 고정 추가
-        const lockCard = `
-<div class="asset-card">
-  <div class="asset-card-img" style="aspect-ratio:1;position:relative;">
-    <div class="asset-img-bg" style="background:linear-gradient(145deg,#0f172a,#1e293b);filter:blur(4px);"></div>
-    <div class="lock-overlay">
-      <div class="lock-icon">🔒</div>
-      <div class="lock-title">명함 이미지 잠금</div>
-      <div class="lock-sub">맞팔 회원만 열람 가능<br>로그인 후 요청 가능</div>
-      <a href="https://kei.bio" class="btn btn-primary btn-sm" target="_blank">로그인 →</a>
-    </div>
-  </div>
-  <div class="asset-card-body">
-    <div class="asset-card-name" style="color:var(--text-4);">로고 · 명함</div>
-    <div class="asset-card-actions"><span class="badge badge-gray">🔒 잠금</span></div>
-  </div>
-</div>`;
-
-        grid.innerHTML = cards + lockCard;
+        grid.innerHTML = cards;
       } catch(e) {
         console.warn('[showcase]', e.message);
       }
@@ -709,7 +690,7 @@
       <div class="card winner-card card-glow-gold">
         <div class="winner-trophy">🥇</div>
         <div class="winner-year">2025 · 상품 디자인 부문</div>
-        <div class="winner-brand">ESCO Beauty</div>
+        <div class="winner-brand">ESCO Cosmetics</div>
         <div class="winner-cat">Jeju Tangerine Series</div>
       </div>
       <div class="card winner-card card-glow-purple">
