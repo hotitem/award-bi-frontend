@@ -20,10 +20,10 @@
       </nav>
 
       <div class="flex items-center gap-2 ml-auto">
-        <!-- BTC 가격 -->
-        <div v-if="btc.btcPriceKrw" class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gold/10 border border-gold/20 text-xs font-semibold cursor-default">
-          <span class="text-gold">ⓑ</span>
-          <span class="text-gold-light font-mono">₩{{ Math.round(btc.btcPriceKrw).toLocaleString() }}</span>
+        <!-- BTC 블록 높이 -->
+        <div v-if="btc.blockHeight" class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gold/10 border border-gold/20 text-xs font-semibold cursor-default" title="최신 Bitcoin 블록 높이">
+          <span class="text-gold">⚓</span>
+          <span class="text-gold-light font-mono">#{{ btc.blockHeight.toLocaleString() }}</span>
         </div>
 
         <!-- 언어 -->
