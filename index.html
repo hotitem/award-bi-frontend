@@ -199,7 +199,7 @@
           </div>
           <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(245,158,11,0.15);display:flex;justify-content:space-between;font-size:11px;">
             <span style="color:#78350f;">최신 블록</span>
-            <span style="font-weight:700;color:#fcd34d;font-family:monospace;">#895,412 ✓</span>
+            <span style="font-weight:700;color:#fcd34d;font-family:monospace;" id="heroLatestBlock">#895,412 ✓</span>
           </div>
         </div>
 
@@ -310,7 +310,7 @@
             <div style="font-size:11px;color:var(--text-4);">총 각인 VC</div>
           </div>
           <div>
-            <div style="font-size:28px;font-weight:900;color:#a78bfa;">895,412</div>
+            <div style="font-size:28px;font-weight:900;color:#a78bfa;" id="statLatestBlock">895,412</div>
             <div style="font-size:11px;color:var(--text-4);">최신 블록</div>
           </div>
           <div>
@@ -922,6 +922,24 @@
   </div>
 </footer>
 
+<script>
+// 실제 Bitcoin 최신 블록 조회 (Blockstream API)
+(async function loadBtcBlock() {
+  try {
+    const h = await fetch('https://blockstream.info/api/blocks/tip/height');
+    if (!h.ok) return;
+    const height = parseInt(await h.text());
+    if (!height) return;
+    const fmt = height.toLocaleString('ko-KR');
+    const ids = ['heroLatestBlock','statLatestBlock'];
+    ids.forEach(id => { const el=document.getElementById(id); if(el) el.textContent = (id==='heroLatestBlock'?'#':'')+fmt+(id==='heroLatestBlock'?' ✓':''); });
+    // 티커 업데이트
+    document.querySelectorAll('.ticker-item').forEach(el => {
+      if(el.textContent.includes('#895,412')) el.innerHTML = el.innerHTML.replace(/#895,412/g,'#'+fmt);
+    });
+  } catch(e) { /* 실패 시 기존 값 유지 */ }
+})();
+</script>
 <script src="assets/js/main.js"></script>
 <script src="assets/js/ssum-login.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" onload="initWorldMap()"></script>
