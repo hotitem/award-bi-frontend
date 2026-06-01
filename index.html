@@ -131,20 +131,52 @@
           </div>
         </div>
 
-        <!-- ② 인증 자산 카드 (ESCO) -->
-        <div style="background:rgba(20,25,41,0.9);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:20px 24px;display:flex;align-items:center;gap:16px;">
-          <div style="width:72px;height:72px;border-radius:14px;background:linear-gradient(145deg,#001a35,#003580);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;animation:float 4s ease-in-out infinite;">💙</div>
+        <!-- ② 인증 자산 카드 (ESCO — API 동적 로딩) -->
+        <div id="heroAssetCard" style="background:rgba(20,25,41,0.9);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:20px 24px;display:flex;align-items:center;gap:16px;">
+          <div style="width:72px;height:72px;border-radius:14px;background:#1a1f2e;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;overflow:hidden;">⏳</div>
           <div style="flex:1;min-width:0;">
-            <div style="font-size:15px;font-weight:800;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">ESCO B5 Barrier Cream</div>
+            <div style="font-size:15px;font-weight:800;margin-bottom:4px;color:#e2e8f0;">로딩 중...</div>
             <div style="font-size:11px;color:#64748b;margin-bottom:8px;">by kei.bio/esco</div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;">
-              <span style="padding:3px 8px;border-radius:100px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.35);font-size:10px;font-weight:700;color:#34d399;">✓ Kei 공식인증</span>
-              <span style="padding:3px 8px;border-radius:100px;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);font-size:10px;font-weight:700;color:#a78bfa;">⭐ SBT</span>
-              <span style="padding:3px 8px;border-radius:100px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.35);font-size:10px;font-weight:700;color:#fcd34d;">⚓ 각인</span>
-            </div>
           </div>
-          <a href="/verify.html?id=vc-esco-003" style="flex-shrink:0;padding:8px 14px;border-radius:8px;border:1px solid rgba(124,58,237,0.4);color:#a78bfa;font-size:12px;font-weight:600;white-space:nowrap;">🔍 검증</a>
         </div>
+        <script>
+        (async function loadHeroAsset() {
+          try {
+            const r = await fetch('https://api.award.bi/brands/esco/assets?limit=20');
+            const d = await r.json();
+            const assets = d.assets || [];
+            // 상품 디자인 중 이미지가 있는 첫 번째 (product_design 우선)
+            const asset = assets.find(a => a.asset_class === 'product_design' && a.source_url)
+                       || assets.find(a => a.source_url);
+            if (!asset) return;
+
+            const meta  = asset.asset_metadata || {};
+            const title = meta.title || asset.asset_class;
+            const vcLink = asset.vc_id ? `/verify.html?id=${asset.vc_id}` : null;
+            const isCert = Boolean(asset.atelier_approved_at);
+
+            const card = document.getElementById('heroAssetCard');
+            if (!card) return;
+
+            card.innerHTML = `
+              <div style="width:72px;height:72px;border-radius:14px;background:#1a1f2e;flex-shrink:0;overflow:hidden;animation:float 4s ease-in-out infinite;position:relative;">
+                <img src="${asset.source_url}" alt="${title}" loading="lazy"
+                  style="width:100%;height:100%;object-fit:cover;"
+                  onerror="this.parentElement.innerHTML='💙'">
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:15px;font-weight:800;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#e2e8f0;">${title}</div>
+                <div style="font-size:11px;color:#64748b;margin-bottom:8px;">by kei.bio/esco</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                  ${isCert ? `<span style="padding:3px 8px;border-radius:100px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.35);font-size:10px;font-weight:700;color:#34d399;">✓ award.bi 인증</span>` : `<span style="padding:3px 8px;border-radius:100px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.35);font-size:10px;font-weight:700;color:#fcd34d;">⏳ 심사 중</span>`}
+                  <span style="padding:3px 8px;border-radius:100px;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);font-size:10px;font-weight:700;color:#a78bfa;">⭐ SBT</span>
+                  ${isCert ? `<span style="padding:3px 8px;border-radius:100px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.35);font-size:10px;font-weight:700;color:#fcd34d;">⚓ 각인</span>` : ''}
+                </div>
+              </div>
+              ${vcLink ? `<a href="${vcLink}" style="flex-shrink:0;padding:8px 14px;border-radius:8px;border:1px solid rgba(124,58,237,0.4);color:#a78bfa;font-size:12px;font-weight:600;white-space:nowrap;">🔍 검증</a>` : `<a href="/brand/esco.html" style="flex-shrink:0;padding:8px 14px;border-radius:8px;border:1px solid rgba(124,58,237,0.4);color:#a78bfa;font-size:12px;font-weight:600;white-space:nowrap;">보기 →</a>`}`;
+          } catch(e) { /* 로딩 실패 시 기존 상태 유지 */ }
+        })();
+        </script>
 
         <!-- ③ Bitcoin 각인 카운트다운 (핵심 강조) -->
         <div style="background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(245,158,11,0.05));backdrop-filter:blur(16px);border:1px solid rgba(245,158,11,0.3);border-radius:16px;padding:20px 24px;">
