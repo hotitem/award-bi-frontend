@@ -68,7 +68,8 @@
           style="width:48px;height:56px;text-align:center;font-size:24px;font-weight:800;background:#0f1117;border:2px solid rgba(124,58,237,0.3);border-radius:10px;color:#e2e8f0;outline:none;"
           onfocus="this.style.borderColor='#7c3aed'" onblur="this.style.borderColor='rgba(124,58,237,0.3)'"
           oninput="window.AwardAuth._otpInput(this,${i})"
-          onkeydown="window.AwardAuth._otpKey(event,${i})">`).join('')}
+          onkeydown="window.AwardAuth._otpKey(event,${i})"
+          onpaste="window.AwardAuth._otpPaste(event)">`).join('')}
       </div>
       <div id="loginError2" style="color:#f87171;font-size:12px;margin-bottom:12px;text-align:center;display:none;"></div>
       <button onclick="window.AwardAuth._verifyOTP()"
@@ -115,6 +116,8 @@
       if (!res.ok || data.status !== 'success') throw new Error(data.message || '발송 실패');
       _sessionToken = data.session_token;
       document.getElementById('loginEmailShow').textContent = email;
+      [0,1,2,3,4,5].forEach(i => { const inp = document.getElementById(`otp${i}`); if (inp) inp.value = ''; });
+      showErr(2, '');
       setStep(2);
       setTimeout(() => document.getElementById('otp0')?.focus(), 100);
     } catch (e) {
@@ -145,19 +148,25 @@
     if (e.key === 'Backspace' && !e.target.value && idx > 0) document.getElementById(`otp${idx-1}`)?.focus();
   };
 
-  /* ── 붙여넣기 이벤트 (전역) ─────────────────── */
-  document.addEventListener('paste', function (e) {
-    const step2 = document.getElementById('loginStep2');
-    if (!step2 || step2.style.display === 'none') return;
-    const digits = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
-    if (!digits) return;
+  /* ── 붙여넣기 (각 input onpaste + 전역 fallback) ── */
+  AwardAuth._otpPaste = function (e) {
     e.preventDefault();
+    e.stopPropagation();
+    const text = (e.clipboardData || window.clipboardData).getData('text') || '';
+    const digits = text.replace(/\D/g, '').slice(0, 6);
+    if (!digits) return;
     digits.split('').forEach((c, i) => {
       const inp = document.getElementById(`otp${i}`);
       if (inp) inp.value = c;
     });
-    document.getElementById(`otp${Math.min(digits.length, 5)}`)?.focus();
+    document.getElementById(`otp${Math.min(digits.length - 1, 5)}`)?.focus();
     if (digits.length === 6) AwardAuth._verifyOTP();
+  };
+
+  document.addEventListener('paste', function (e) {
+    const step2 = document.getElementById('loginStep2');
+    if (!step2 || step2.style.display === 'none') return;
+    AwardAuth._otpPaste(e);
   });
 
   /* ── OTP 검증 ──────────────────────────────── */
@@ -191,7 +200,7 @@
         body: JSON.stringify({ user_token: ssumToken })
       });
       const awardData = await awardRes.json();
-      if (!awardRes.ok || !awardData.ok) throw new Error('award.bi 인증 실패');
+      if (!awardRes.ok || !awardData.ok) throw new Error('award.bi 서버 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.');
 
       // 3. 저장
       sessionStorage.setItem(TOKEN_KEY, awardData.token);
