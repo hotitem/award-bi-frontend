@@ -49,7 +49,7 @@
               <span v-else class="text-4xl opacity-30">🖼</span>
             </div>
             <div class="text-sm font-semibold text-txt-1 mb-1 truncate">
-              {{ asset.asset_metadata?.name ?? asset.asset_class }}
+              {{ asset.asset_metadata?.title ?? asset.asset_metadata?.name ?? asset.asset_class }}
             </div>
             <div class="flex items-center gap-2">
               <span class="badge badge-purple text-[10px]">{{ asset.token_category }}</span>
