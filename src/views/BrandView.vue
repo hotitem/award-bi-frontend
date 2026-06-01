@@ -48,25 +48,35 @@
             <div class="relative aspect-video rounded-md bg-bg-0 border border-white/5 overflow-hidden mb-3">
               <!-- 영상 -->
               <template v-if="isVideo(asset.source_url, asset.asset_class)">
-                <video
-                  :src="asset.source_url"
-                  class="w-full h-full object-cover"
-                  muted
-                  loop
-                  playsinline
-                  preload="metadata"
-                  @mouseenter="(e) => (e.target as HTMLVideoElement).play()"
-                  @mouseleave="(e) => { (e.target as HTMLVideoElement).pause(); (e.target as HTMLVideoElement).currentTime = 0 }"
-                />
-                <div class="absolute inset-0 flex items-center justify-center opacity-70 group-hover:opacity-0 transition-opacity pointer-events-none">
-                  <div class="w-10 h-10 rounded-full bg-black/60 flex items-center justify-center text-white text-lg">▶</div>
+                <!-- 비디오 에러 시 폴백 아이콘 -->
+                <div v-if="videoErrors[asset.declaration_id]"
+                     class="w-full h-full flex flex-col items-center justify-center gap-2">
+                  <span class="text-4xl">🎬</span>
+                  <span class="text-[10px] text-txt-4">브랜드 영상</span>
+                  <a :href="asset.source_url" target="_blank"
+                     class="text-[10px] text-primary-light hover:underline"
+                     @click.stop>영상 열기 ↗</a>
                 </div>
+                <template v-else>
+                  <video
+                    :src="asset.source_url"
+                    class="w-full h-full object-cover"
+                    muted loop playsinline preload="metadata"
+                    @error="videoErrors[asset.declaration_id] = true"
+                    @mouseenter="(e) => (e.target as HTMLVideoElement).play().catch(()=>{})"
+                    @mouseleave="(e) => { (e.target as HTMLVideoElement).pause(); (e.target as HTMLVideoElement).currentTime = 0 }"
+                  />
+                  <div class="absolute inset-0 flex items-center justify-center opacity-60 group-hover:opacity-0 transition-opacity pointer-events-none">
+                    <div class="w-10 h-10 rounded-full bg-black/60 flex items-center justify-center text-white text-lg">▶</div>
+                  </div>
+                </template>
                 <span class="absolute top-2 left-2 badge badge-gold text-[9px]">🎬 VIDEO</span>
               </template>
               <!-- 이미지 -->
               <template v-else-if="asset.source_url">
                 <img :src="asset.source_url" :alt="asset.asset_metadata?.title ?? ''"
-                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                     @error="(e) => (e.target as HTMLImageElement).style.display='none'" />
               </template>
               <span v-else class="absolute inset-0 flex items-center justify-center text-4xl opacity-30">🖼</span>
             </div>
@@ -110,12 +120,13 @@ function isVideo(url?: string, assetClass?: string): boolean {
   return VIDEO_EXTS.some(ext => url.toLowerCase().includes(ext))
 }
 
-const brand    = ref<Record<string,unknown> | null>(null)
-const assets   = ref<Record<string,unknown>[]>([])
-const loading  = ref(true)
-const showQr   = ref(false)
-const shortUrl = ref('')
-const qrCanvas = ref<HTMLCanvasElement | null>(null)
+const brand       = ref<Record<string,unknown> | null>(null)
+const assets      = ref<Record<string,unknown>[]>([])
+const loading     = ref(true)
+const showQr      = ref(false)
+const shortUrl    = ref('')
+const qrCanvas    = ref<HTMLCanvasElement | null>(null)
+const videoErrors = ref<Record<string, boolean>>({})
 
 async function load(slug: string) {
   loading.value = true

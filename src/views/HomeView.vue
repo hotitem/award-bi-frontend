@@ -69,9 +69,14 @@
           <!-- Featured Asset -->
           <div v-if="featuredAsset" class="card p-4 flex items-center gap-4 cursor-pointer hover:border-primary/30 transition-colors"
                @click="router.push(`/verify?id=${featuredAsset.vc_id}`)">
-            <div class="w-14 h-14 rounded-lg overflow-hidden bg-bg-0 flex-shrink-0">
-              <img v-if="featuredAsset.source_url" :src="featuredAsset.source_url" class="w-full h-full object-cover" />
-              <div v-else class="w-full h-full flex items-center justify-center text-2xl">🧴</div>
+            <div class="w-14 h-14 rounded-lg overflow-hidden bg-bg-0 border border-white/10 flex-shrink-0 flex items-center justify-center">
+              <template v-if="isVideo(featuredAsset.source_url as string, featuredAsset.asset_class as string)">
+                <span class="text-2xl">🎬</span>
+              </template>
+              <img v-else-if="featuredAsset.source_url" :src="featuredAsset.source_url as string"
+                   class="w-full h-full object-cover"
+                   @error="(e) => (e.target as HTMLImageElement).style.display='none'" />
+              <span v-else class="text-2xl">🧴</span>
             </div>
             <div class="flex-1 min-w-0">
               <div class="font-bold text-txt-1 text-sm truncate">
@@ -312,14 +317,22 @@
             <div class="relative aspect-[3/4] rounded-xl overflow-hidden bg-bg-0 border border-white/5 mb-2">
               <!-- 영상 자산 -->
               <template v-if="isVideo(asset.source_url as string, asset.asset_class as string)">
-                <video :src="asset.source_url as string"
-                       class="w-full h-full object-cover"
-                       muted loop playsinline preload="metadata"
-                       @mouseenter="(e) => (e.target as HTMLVideoElement).play()"
-                       @mouseleave="(e) => { (e.target as HTMLVideoElement).pause(); (e.target as HTMLVideoElement).currentTime = 0 }" />
-                <div class="absolute inset-0 flex items-center justify-center opacity-60 group-hover:opacity-0 transition-opacity pointer-events-none">
-                  <div class="w-10 h-10 rounded-full bg-black/60 flex items-center justify-center text-white">▶</div>
+                <div v-if="homeVideoErrors[asset.declaration_id as string]"
+                     class="w-full h-full flex flex-col items-center justify-center gap-1">
+                  <span class="text-3xl">🎬</span>
+                  <span class="text-[9px] text-txt-4">브랜드 영상</span>
                 </div>
+                <template v-else>
+                  <video :src="asset.source_url as string"
+                         class="w-full h-full object-cover"
+                         muted loop playsinline preload="metadata"
+                         @error="homeVideoErrors[asset.declaration_id as string] = true"
+                         @mouseenter="(e) => (e.target as HTMLVideoElement).play().catch(()=>{})"
+                         @mouseleave="(e) => { (e.target as HTMLVideoElement).pause(); (e.target as HTMLVideoElement).currentTime = 0 }" />
+                  <div class="absolute inset-0 flex items-center justify-center opacity-60 group-hover:opacity-0 transition-opacity pointer-events-none">
+                    <div class="w-10 h-10 rounded-full bg-black/60 flex items-center justify-center text-white">▶</div>
+                  </div>
+                </template>
               </template>
               <!-- 이미지 자산 -->
               <img v-else-if="asset.source_url" :src="asset.source_url as string"
@@ -574,6 +587,8 @@ function assetIcon(cls: string) {
 function assetLabel(cls: string) {
   return { product_design:'상품 디자인', brand_logo:'로고·명함', brand_video:'브랜드 영상', model_portrait:'모델·AI' }[cls] ?? cls
 }
+const homeVideoErrors = ref<Record<string, boolean>>({})
+
 const VIDEO_EXTS = ['.mp4', '.mov', '.webm', '.ogg', '.m4v']
 function isVideo(url?: string, cls?: string): boolean {
   if (cls === 'brand_video') return true
