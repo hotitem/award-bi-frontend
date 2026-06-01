@@ -185,8 +185,8 @@
               <span class="btc-proof-val" style="word-break:break-all;font-size:11px;">7f3a9c2e1b4d5f8a0c3e6b9d2f5a8c1e4b7d0f3a6c9e2b5d8f1a4c7e0b3d6f9a</span>
             </div>
             <div class="btc-proof-row">
-              <span class="btc-proof-key">OTS 파일</span>
-              <span class="btc-proof-val">⬇️ 2025-05-27.ots</span>
+              <span class="btc-proof-key">증명 파일</span>
+              <span class="btc-proof-val">⬇️ 2026-06-01.proof</span>
             </div>
             <div class="btc-ext-links">
               <a href="https://mempool.space/tx/7f3a9c2e" class="btc-ext-link" target="_blank">mempool.space ↗</a>
@@ -247,14 +247,14 @@
               ⬇️ W3C VC JSON 다운로드
             </button>
             <button class="btn btn-outline" style="width:100%;" onclick="downloadOTS()">
-              ⬇️ .ots 파일 다운로드
+              ⬇️ Bitcoin 증명 파일 다운로드
             </button>
             <a href="https://opensea.io" class="btn btn-outline" style="width:100%;" target="_blank">
               🌊 OpenSea에서 확인 ↗
             </a>
             <div style="padding:14px;background:var(--bg-1);border-radius:var(--radius-md);font-size:12px;color:var(--text-3);line-height:1.6;">
               <strong style="color:var(--text-2);">🛡️ 검증 방법:</strong><br>
-              .ots 파일과 VC 해시로<br>
+              Bitcoin 증명 파일과 VC 해시로<br>
               비트코인 블록체인에서<br>
               독립적으로 검증 가능합니다.
             </div>
@@ -521,7 +521,7 @@ function renderBitcoin(bitcoin) {
     if (rows[1]) rows[1].querySelector('.btc-proof-val').textContent = blockTime;
     if (rows[2]) rows[2].querySelector('.btc-proof-val').textContent = bitcoin.btc_tx_hash || '—';
     if (rows[3]) rows[3].querySelector('.btc-proof-val').innerHTML = bitcoin.ots_file_url
-      ? `<a href="${bitcoin.ots_file_url}" style="color:var(--purple-l);">⬇️ .ots 다운로드</a>`
+      ? `<a href="${bitcoin.ots_file_url}" style="color:var(--purple-l);">⬇️ Bitcoin 증명 다운로드</a>`
       : (bitcoin.ots_status === 'pending' ? '⏳ 대기 중' : '—');
 
     if (bitcoin.external_links) {
