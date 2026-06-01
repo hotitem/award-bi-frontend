@@ -45,20 +45,23 @@
         type="text"
         class="verify-input"
         id="verifyInput"
-        placeholder="VC ID 또는 SHA-256 해시 입력... (예: vc-esco-001 또는 3d9a2f...)"
+        placeholder="VC ID · SHA-256 해시 · BTC TX · 브랜드명 · 제품명"
         autocomplete="off"
       >
       <button class="btn btn-primary" id="verifyBtn" onclick="doVerify()">
         🔍 검증
       </button>
     </div>
+    <div style="font-size:12px;color:var(--text-4);text-align:center;margin-bottom:16px;">
+      UUID · 64자 해시 · 브랜드명 · 제품명 모두 검색 가능
+    </div>
 
-    <!-- Quick demo links -->
+    <!-- Quick demo links — 실제 VC ID -->
     <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
       <span style="font-size:13px;color:var(--text-4);">예시:</span>
-      <button class="btn btn-outline btn-sm" onclick="loadDemo('vc-esco-001')">ESCO Jeju Cream SBT</button>
-      <button class="btn btn-outline btn-sm" onclick="loadDemo('vc-esco-002')">ESCO Elin 모델 SBT</button>
-      <button class="btn btn-outline btn-sm" onclick="loadDemo('vc-esco-003')">ESCO B5 Cream SBT</button>
+      <button class="btn btn-outline btn-sm" onclick="loadDemo('c184c7e4-7d40-4d70-8a07-19f190e1cfe5')">Jeju Tangerine Cream</button>
+      <button class="btn btn-outline btn-sm" onclick="loadDemo('12920919-58cf-49d0-94a8-fd12e99e6f25')">Elin AI Model</button>
+      <button class="btn btn-outline btn-sm" onclick="loadDemo('ESCO')">ESCO 브랜드 검색</button>
     </div>
   </div>
 </section>
@@ -306,34 +309,86 @@
 const API = 'https://api.award.bi';
 let currentVcData = null;
 
-// ─── Verify ───────────────────────────────────
+// ─── Verify — 통합 검색 (/verify/search?q=) ──
 async function doVerify() {
   const input = document.getElementById('verifyInput').value.trim();
   if (!input) { document.getElementById('verifyInput').focus(); return; }
+  if (input.length < 2) { showError('검색어를 2자 이상 입력해주세요'); return; }
 
   setLoading(true);
 
-  // SHA-256 hash (64 hex chars) → /verify/hash/:hash
-  const isHash = /^[0-9a-fA-F]{64}$/.test(input);
-  const url = isHash
-    ? `${API}/verify/hash/${encodeURIComponent(input)}`
-    : `${API}/verify/${encodeURIComponent(input)}`;
-
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
+    const res = await fetch(
+      `${API}/verify/search?q=${encodeURIComponent(input)}`,
+      { signal: AbortSignal.timeout(12000) }
+    );
+    const data = await res.json().catch(() => ({}));
+
     if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      if (res.status === 404) throw new Error('인증서를 찾을 수 없습니다');
-      throw new Error(err.error || `오류 ${res.status}`);
+      const msg = data.message || data.error || `오류 ${res.status}`;
+      throw new Error(msg);
     }
-    const data = await res.json();
+
+    // 텍스트 검색 결과 (여러 건)
+    if (data.search_mode === 'text' && Array.isArray(data.results)) {
+      renderSearchResults(data.results);
+      return;
+    }
+
+    // BTC TX 배치 결과
+    if (data.search_mode === 'btc_tx') {
+      renderBatchResult(data);
+      return;
+    }
+
+    // 단일 VC 결과 (vc_id / asset_hash / vc_hash)
     currentVcData = data;
     renderResult(data);
+
   } catch (e) {
-    showError(e.message);
+    showError(e.message || '검색 중 오류가 발생했습니다');
   } finally {
     setLoading(false);
   }
+}
+
+// 텍스트 검색 결과 목록 렌더링
+function renderSearchResults(results) {
+  document.getElementById('resultArea').style.display = 'none';
+  document.getElementById('emptyState').style.display = 'block';
+  const items = results.map(r => `
+    <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;cursor:pointer;"
+      onclick="document.getElementById('verifyInput').value='${r.vc_id}';doVerify()">
+      <div style="font-size:22px;">⭐</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:14px;">${r.asset_metadata?.title || r.asset_class}</div>
+        <div style="font-size:12px;color:var(--text-3);">${r.brand_name || '—'} · ${r.token_type || 'SBT'} · ${new Date(r.issued_at).toLocaleDateString('ko-KR')}</div>
+      </div>
+      <div style="font-size:11px;color:var(--purple-l);">검증 →</div>
+    </div>`).join('');
+  document.getElementById('emptyState').innerHTML = `
+    <div style="font-size:18px;font-weight:800;margin-bottom:16px;">검색 결과 ${results.length}건</div>
+    <div style="display:flex;flex-direction:column;gap:8px;max-width:700px;margin:0 auto;">${items}</div>
+    <button class="btn btn-outline" style="margin-top:20px;" onclick="resetState()">초기화</button>`;
+}
+
+// BTC 배치 결과 렌더링
+function renderBatchResult(data) {
+  document.getElementById('resultArea').style.display = 'none';
+  document.getElementById('emptyState').style.display = 'block';
+  const b = data.batch || {};
+  const vcList = (data.vcs || []).map(v => `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;cursor:pointer;"
+      onclick="document.getElementById('verifyInput').value='${v.vc_id}';doVerify()">
+      <div style="font-size:11px;color:var(--text-4);width:24px;">#${v.leaf_index}</div>
+      <div style="font-size:12px;font-family:monospace;color:var(--text-2);flex:1;overflow:hidden;text-overflow:ellipsis;">${v.vc_id}</div>
+      <div style="font-size:11px;color:var(--purple-l);">→</div>
+    </div>`).join('');
+  document.getElementById('emptyState').innerHTML = `
+    <div style="font-size:18px;font-weight:800;margin-bottom:8px;">⚓ Bitcoin 배치</div>
+    <div style="font-size:13px;color:var(--text-3);margin-bottom:16px;">Block #${b.btc_block_height || '대기'} · ${b.vc_count}개 VC · ${b.batch_date}</div>
+    <div style="display:flex;flex-direction:column;gap:6px;max-width:700px;margin:0 auto;">${vcList}</div>
+    <button class="btn btn-outline" style="margin-top:20px;" onclick="resetState()">초기화</button>`;
 }
 
 function setLoading(on) {
