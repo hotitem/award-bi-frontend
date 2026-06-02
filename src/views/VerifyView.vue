@@ -20,8 +20,17 @@
         </button>
       </div>
 
-      <!-- 오류 -->
-      <div v-if="error" class="card p-6 text-center text-red-400">{{ error }}</div>
+      <!-- 오류/안내 -->
+      <div v-if="error" class="card p-6 text-center"
+           :class="error.includes('심사') ? 'border-gold/30 bg-gold/5' : 'border-red-500/20'">
+        <div v-if="error.includes('심사')" class="text-4xl mb-3">⏳</div>
+        <div v-else class="text-4xl mb-3">🔍</div>
+        <div :class="error.includes('심사') ? 'text-gold' : 'text-red-400'"
+             class="text-sm font-semibold whitespace-pre-line">{{ error }}</div>
+        <p v-if="error.includes('심사')" class="text-xs text-txt-4 mt-3">
+          아뜰리에 담당자가 검토 후 승인하면 Bitcoin 각인 후 이 페이지에서 검증됩니다.
+        </p>
+      </div>
 
       <!-- 결과 -->
       <div v-if="result" class="space-y-4">
@@ -110,22 +119,43 @@ const loading= ref(false)
 const error  = ref('')
 const result = ref<Record<string,unknown> | null>(null)
 
+// 유효하지 않은 ID 패턴 (null, undefined, empty, 짧은 값)
+const INVALID_IDS = new Set(['null', 'undefined', '', '0'])
+
 async function doVerify() {
   const q = query.value.trim()
-  if (!q || q.length < 2) return
-  loading.value = true
   error.value = ''
   result.value = null
+
+  // null / 빈값 처리
+  if (!q || q.length < 2 || INVALID_IDS.has(q)) {
+    error.value = '⏳ 아직 심사 중이거나 유효하지 않은 인증서입니다.\n아뜰리에 승인 후 VC가 발행되면 검증 가능합니다.'
+    query.value = ''
+    return
+  }
+
+  loading.value = true
   try {
     const { data } = await verifySearch(q)
     if (data.ok) result.value = data
     else throw new Error(data.message || t('verify.not_found'))
-  } catch (e: unknown) { error.value = (e as Error).message }
+  } catch (e: unknown) {
+    const msg = (e as { response?: { status?: number } })?.response?.status === 404
+      ? '인증서를 찾을 수 없습니다. 아직 심사 중이거나 발행되지 않은 자산일 수 있습니다.'
+      : (e as Error).message
+    error.value = msg
+  }
   finally { loading.value = false }
 }
 
 onMounted(() => {
   const id = route.query.id as string
-  if (id) { query.value = id; doVerify() }
+  if (id && !INVALID_IDS.has(id)) {
+    query.value = id
+    doVerify()
+  } else if (id && INVALID_IDS.has(id)) {
+    // null 등 invalid ID로 진입 시 안내만 표시
+    error.value = '⏳ 아직 심사 중인 자산입니다.\n아뜰리에 승인 후 VC가 발행되면 여기서 검증할 수 있습니다.'
+  }
 })
 </script>

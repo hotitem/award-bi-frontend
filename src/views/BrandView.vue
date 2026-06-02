@@ -41,8 +41,9 @@
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
           <div
             v-for="asset in assets" :key="asset.declaration_id"
-            class="card-hover p-4 cursor-pointer group"
-            @click="router.push(`/verify?id=${asset.vc_id}`)"
+            class="card-hover p-4 group"
+            :class="asset.vc_id ? 'cursor-pointer' : 'cursor-default'"
+            @click="asset.vc_id ? router.push(`/verify?id=${asset.vc_id}`) : null"
           >
             <!-- 미디어 (이미지 / 영상 자동 감지) -->
             <div class="relative aspect-video rounded-md bg-bg-0 border border-white/5 overflow-hidden mb-3">
@@ -86,9 +87,10 @@
             </div>
             <div class="flex items-center gap-2 flex-wrap">
               <span class="badge badge-purple text-[10px]">{{ asset.token_category }}</span>
-              <span v-if="asset.vc_id" class="badge badge-green text-[10px]">✓ VC</span>
-              <span v-if="asset.ots_status === 'submitted'" class="badge badge-gold text-[9px]">📡 BTC</span>
-              <span v-if="asset.ots_status === 'confirmed'" class="badge badge-green text-[9px]">⚓ 각인</span>
+              <span v-if="!asset.vc_id" class="badge badge-gold text-[10px]">⏳ 심사 중</span>
+              <span v-else-if="asset.ots_status === 'confirmed'" class="badge badge-green text-[9px]">⚓ 각인</span>
+              <span v-else-if="asset.ots_status === 'submitted'" class="badge badge-gold text-[9px]">📡 BTC</span>
+              <span v-else class="badge badge-green text-[10px]">✓ 인증</span>
             </div>
           </div>
         </div>
