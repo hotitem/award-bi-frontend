@@ -2,52 +2,23 @@
   <section class="py-12 bg-bg-0 min-h-screen">
     <div class="container max-w-4xl">
 
-      <!-- ── 로그인 폼 (미인증 시) ── -->
+      <!-- ── 로그인 유도 (미인증 시) ── -->
       <div v-if="!auth.isAtelier" class="max-w-sm mx-auto mt-16">
-        <div class="card p-8">
-          <div class="text-center mb-8">
-            <div class="text-4xl mb-3">🎨</div>
-            <h1 class="text-xl font-black text-txt-1">아뜰리에 로그인</h1>
-            <p class="text-xs text-txt-3 mt-1">관리자 계정으로 접근하세요</p>
-          </div>
-
-          <form @submit.prevent="doLogin" class="space-y-4">
-            <div>
-              <label class="block text-xs text-txt-3 mb-1.5 font-medium">이메일</label>
-              <input
-                v-model="form.email"
-                type="email"
-                autocomplete="email"
-                placeholder="admin@email.com"
-                class="w-full px-4 py-2.5 rounded-lg bg-bg-card border border-white/10 text-txt-1 text-sm
-                       focus:outline-none focus:border-primary placeholder:text-txt-4"
-                required
-              />
-            </div>
-            <div>
-              <label class="block text-xs text-txt-3 mb-1.5 font-medium">비밀번호</label>
-              <input
-                v-model="form.password"
-                type="password"
-                autocomplete="current-password"
-                placeholder="••••••••"
-                class="w-full px-4 py-2.5 rounded-lg bg-bg-card border border-white/10 text-txt-1 text-sm
-                       focus:outline-none focus:border-primary placeholder:text-txt-4"
-                required
-              />
-            </div>
-
-            <p v-if="loginError" class="text-xs text-red-400 text-center">{{ loginError }}</p>
-
-            <button
-              type="submit"
-              :disabled="logging"
-              class="btn btn-primary w-full mt-2"
-            >
-              <span v-if="logging" class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-              {{ logging ? '로그인 중...' : '로그인' }}
-            </button>
-          </form>
+        <div class="card p-8 text-center">
+          <div class="text-5xl mb-4">🎨</div>
+          <h1 class="text-xl font-black text-txt-1 mb-2">아뜰리에 대시보드</h1>
+          <p class="text-sm text-txt-3 mb-6">
+            관리자 이메일로 로그인하면<br>자동으로 이 페이지로 이동합니다.
+          </p>
+          <button
+            @click="auth.openLogin()"
+            class="btn btn-primary w-full py-3"
+          >
+            ✉️ 이메일 인증으로 로그인
+          </button>
+          <p class="text-xs text-txt-4 mt-4">
+            관리자 이메일 입력 → 인증코드 수신 → 로그인 → 아뜰리에 자동 이동
+          </p>
         </div>
       </div>
 
@@ -138,25 +109,6 @@ import { useAuthStore } from '@/stores/auth'
 import { getDeclarations, approveDecl, rejectDecl } from '@/api/award'
 
 const auth = useAuthStore()
-
-// ── 로그인 폼 ──
-const form       = ref({ email: '', password: '' })
-const loginError = ref('')
-const logging    = ref(false)
-
-async function doLogin() {
-  loginError.value = ''
-  logging.value = true
-  try {
-    await auth.loginAsAdmin(form.value.email, form.value.password)
-    load()
-  } catch (e: unknown) {
-    const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message
-    loginError.value = msg ?? '로그인 실패. 이메일과 비밀번호를 확인하세요.'
-  } finally {
-    logging.value = false
-  }
-}
 
 // ── 대시보드 ──
 const decls      = ref<Record<string, unknown>[]>([])

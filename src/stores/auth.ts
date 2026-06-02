@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { authSsumLogin, authAdminLogin, authMe } from '@/api/award'
+import router from '@/router'
 
 export interface AwardUser {
   user_id:       string
@@ -38,9 +39,9 @@ export const useAuthStore = defineStore('auth', () => {
     return false
   }
 
-  // ssum OTP 인증 완료 후 호출
+  // ssum OTP 인증 완료 후 호출 — email을 API에 전달하여 admin 체크
   async function loginWithSsum(userToken: string, email: string) {
-    const { data } = await authSsumLogin(userToken)
+    const { data } = await authSsumLogin(userToken, email)
     if (!data.ok) throw new Error('award.bi 인증 실패')
     awardToken.value = data.token
     ssumToken.value = userToken
@@ -57,6 +58,10 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.setItem('ssum_user_token', userToken)
     localStorage.setItem('award_bi_user', JSON.stringify(user.value))
     loginVisible.value = false
+    // 관리자/아뜰리에 계정이면 아뜰리에 대시보드로 이동
+    if (data.user.redirect_atelier) {
+      router.push('/atelier')
+    }
   }
 
   // 이메일+비밀번호 관리자 로그인

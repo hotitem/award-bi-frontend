@@ -84,7 +84,12 @@ router.beforeEach(async (to) => {
 
   if (to.meta.requiresRole) {
     const roles = to.meta.requiresRole as string[]
-    if (!auth.isLoggedIn || !roles.includes(auth.user?.role ?? '')) {
+    if (!auth.isLoggedIn) {
+      // 미로그인 시 로그인 모달 열고 해당 페이지 유지 (AtelierView가 모달 후 처리)
+      auth.openLogin()
+      return false
+    }
+    if (!roles.includes(auth.user?.role ?? '')) {
       return { name: 'home' }
     }
   }
