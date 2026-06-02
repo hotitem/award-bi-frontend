@@ -18,27 +18,34 @@ export const useAuthStore = defineStore('auth', () => {
   const awardToken   = ref(localStorage.getItem('award_bi_token') ?? '')
   const ssumToken    = ref(localStorage.getItem('ssum_user_token') ?? '')
   const loginVisible = ref(false)
-  const isReady      = ref(false)   // restoreSession 완료 여부
+
+  // ── 스토어 생성 시 localStorage에서 즉시 복원 (동기, 라우터 가드용) ──
+  // API 검증은 App.vue onMounted의 restoreSession()에서 비동기로 처리
+  try {
+    const savedUser = localStorage.getItem('award_bi_user')
+    if (savedUser && localStorage.getItem('award_bi_token')) {
+      user.value = JSON.parse(savedUser) as AwardUser
+    }
+  } catch {}
 
   const isLoggedIn  = computed(() => !!user.value)
   const isAtelier   = computed(() => ['atelier','admin'].includes(user.value?.role ?? ''))
   const isAdmin     = computed(() => user.value?.role === 'admin')
 
+  // App.vue onMounted에서 호출 — API로 토큰 유효성 검증
   async function restoreSession() {
     const token = localStorage.getItem('award_bi_token')
-    if (!token) { isReady.value = true; return false }
+    if (!token) { user.value = null; return false }
     try {
       const { data } = await authMe()
       if (data.ok) {
         const saved = JSON.parse(localStorage.getItem('award_bi_user') ?? '{}')
         user.value = { ...data.user, ...saved }
         awardToken.value = token
-        isReady.value = true
         return true
       }
     } catch {}
     logout()
-    isReady.value = true
     return false
   }
 
@@ -102,6 +109,5 @@ export const useAuthStore = defineStore('auth', () => {
     user, awardToken, ssumToken, loginVisible,
     isLoggedIn, isAtelier, isAdmin,
     restoreSession, loginWithSsum, loginAsAdmin, logout, openLogin, closeLogin,
-    isReady,
   }
 })

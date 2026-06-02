@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
@@ -21,13 +20,11 @@ const router = createRouter({
       name: 'brand',
       component: () => import('@/views/BrandView.vue'),
     },
-    // 단축 URL — /s/:code → QR 랜딩 or VC 검증
     {
       path: '/s/:code',
       name: 'short',
       component: () => import('@/views/ShortUrlView.vue'),
     },
-    // 회원 전용
     {
       path: '/my',
       name: 'mypage',
@@ -46,27 +43,23 @@ const router = createRouter({
       component: () => import('@/views/MarketView.vue'),
       meta: { requiresAuth: true },
     },
-    // 아뜰리에
     {
       path: '/atelier',
       name: 'atelier',
       component: () => import('@/views/AtelierView.vue'),
       meta: { requiresRole: ['atelier', 'admin'] },
     },
-    // 관리자
     {
       path: '/admin',
       name: 'admin',
       component: () => import('@/views/AdminView.vue'),
       meta: { requiresRole: ['admin'] },
     },
-    // Open API 문서
     {
       path: '/api',
       name: 'api-docs',
       component: () => import('@/views/ApiDocsView.vue'),
     },
-    // 404
     {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
@@ -75,17 +68,9 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach(async (to) => {
+// localStorage에서 즉시 복원한 user 정보로 라우터 가드 (동기, deadlock 없음)
+router.beforeEach((to) => {
   const auth = useAuthStore()
-
-  // restoreSession()이 완료될 때까지 대기 (페이지 새로고침 시 race condition 방지)
-  if (!auth.isReady) {
-    await new Promise<void>(resolve => {
-      const unwatch = watch(() => auth.isReady, (ready) => {
-        if (ready) { unwatch(); resolve() }
-      })
-    })
-  }
 
   if (to.meta.requiresAuth && !auth.isLoggedIn) {
     auth.openLogin()
