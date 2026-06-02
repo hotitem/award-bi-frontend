@@ -64,7 +64,7 @@
                 <div class="text-[10px] text-txt-3">확인 ✓</div>
               </div>
               <div class="bg-bg-0 rounded-md p-3 text-center border border-gold/20">
-                <div class="text-2xl font-black text-gold">{{ liveFeed.filter((f:any) => f.status==='pending').length || '—' }}</div>
+                <div class="text-2xl font-black text-gold">{{ pendingCount || '—' }}</div>
                 <div class="text-[10px] text-gold">심사 중</div>
               </div>
             </div>
@@ -617,6 +617,8 @@ async function loadFeed(append = false) {
 }
 
 let feedTimer: ReturnType<typeof setInterval> | undefined = undefined
+
+const pendingCount = computed(() => liveFeed.value.filter(f => f.status === 'pending').length)
 
 // ── 카운트다운 ────────────────────────────────────────────
 const countdown = computed(() => {
