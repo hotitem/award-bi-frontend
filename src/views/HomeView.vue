@@ -50,18 +50,22 @@
                 <span class="w-1.5 h-1.5 bg-success rounded-full animate-pulse" /> LIVE
               </span>
             </div>
-            <div class="grid grid-cols-3 gap-3">
+            <div class="grid grid-cols-4 gap-2">
               <div class="bg-bg-0 rounded-md p-3 text-center">
                 <div class="text-2xl font-black text-primary-light">{{ btc.totalVcs.toLocaleString() || '—' }}</div>
                 <div class="text-[10px] text-txt-3">VC 발행</div>
               </div>
               <div class="bg-bg-0 rounded-md p-3 text-center">
                 <div class="text-2xl font-black text-gold">{{ btc.latestBatches.length || '—' }}</div>
-                <div class="text-[10px] text-txt-3">배치</div>
+                <div class="text-[10px] text-txt-3">각인 배치</div>
               </div>
               <div class="bg-bg-0 rounded-md p-3 text-center">
                 <div class="text-2xl font-black text-success-light">{{ btc.totalInscribed || '—' }}</div>
                 <div class="text-[10px] text-txt-3">확인 ✓</div>
+              </div>
+              <div class="bg-bg-0 rounded-md p-3 text-center border border-gold/20">
+                <div class="text-2xl font-black text-gold">{{ liveFeed.filter((f:any) => f.status==='pending').length || '—' }}</div>
+                <div class="text-[10px] text-gold">심사 중</div>
               </div>
             </div>
           </div>
@@ -372,13 +376,15 @@
   </section>
 
   <!-- ── 파트너 채널 라이브 자산 피드 ──────────────────────── -->
-  <section class="py-20 bg-bg-0 border-t border-white/[0.05]">
+  <section class="py-20 bg-bg-1 border-t border-b border-white/[0.07]">
     <div class="container">
       <div class="flex items-end justify-between mb-10 flex-wrap gap-4">
         <div>
           <div class="section-tag">📡 LIVE ASSET FEED</div>
-          <h2 class="section-title">파트너 채널 <span>실시간 자산</span></h2>
-          <p class="text-txt-3 text-sm mt-1">kei.bio에서 수신된 자산이 자동으로 업데이트됩니다</p>
+          <h2 class="text-3xl md:text-4xl font-black text-txt-1 mb-2">
+            인증 <span class="text-primary-light">진행 중</span>
+          </h2>
+          <p class="text-txt-3 text-sm">kei.bio 파트너가 신청한 자산 · 30초 자동 갱신</p>
         </div>
         <!-- 상태 필터 탭 -->
         <div class="flex items-center gap-2 flex-wrap">
@@ -456,12 +462,15 @@
           </div>
 
           <!-- 텍스트 -->
-          <div class="text-[11px] font-semibold text-txt-1 truncate">{{ item.title ?? item.asset_class }}</div>
+          <div class="text-[11px] font-semibold text-txt-1 truncate leading-tight">
+            {{ item.title ?? item.asset_class }}
+          </div>
           <div class="text-[10px] text-txt-4 truncate">{{ item.brand_name }}</div>
+          <div class="text-[9px] text-txt-4 mt-0.5">{{ new Date(item.declared_at).toLocaleDateString('ko-KR') }}</div>
         </div>
       </div>
 
-      <div v-else class="text-center py-12 text-txt-4 text-sm">아직 등록된 자산이 없습니다</div>
+      <div v-else-if="!feedLoading" class="text-center py-12 text-txt-4 text-sm">아직 등록된 자산이 없습니다</div>
 
       <!-- 더보기 + 갱신 안내 -->
       <div class="flex items-center justify-between mt-8 flex-wrap gap-3">
@@ -578,12 +587,8 @@ async function loadEsco() {
 }
 
 // ── 라이브 피드 ───────────────────────────────────────────
-type FeedItem = {
-  declaration_id: string; status: string; asset_class: string
-  source_url: string; title: string; brand_name: string; brand_slug: string
-  vc_id: string | null; btc_status: string | null; declared_at: string
-}
-const liveFeed        = ref<FeedItem[]>([])
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const liveFeed        = ref<any[]>([])
 const feedLoading     = ref(true)
 const feedFilter      = ref('')
 const feedOffset      = ref(0)
@@ -598,16 +603,20 @@ const feedFilters     = [
 async function loadFeed(append = false) {
   feedLoading.value = true
   try {
-    const { data } = await getBrandFeed(24, append ? feedOffset.value : 0, feedFilter.value || undefined)
-    liveFeed.value = append
-      ? [...liveFeed.value, ...(data.feed ?? [])]
-      : (data.feed ?? [])
+    const status = feedFilter.value || undefined
+    const offset = append ? feedOffset.value : 0
+    const { data } = await getBrandFeed(24, offset, status)
+    const items = data.feed ?? []
+    liveFeed.value = append ? [...liveFeed.value, ...items] : items
     feedLastUpdated.value = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-  } catch {} finally { feedLoading.value = false }
+  } catch (e) {
+    console.warn('[feed]', e)
+  } finally {
+    feedLoading.value = false
+  }
 }
 
-// 30초 자동 갱신
-let feedTimer: ReturnType<typeof setInterval>
+let feedTimer: ReturnType<typeof setInterval> | undefined = undefined
 
 // ── 카운트다운 ────────────────────────────────────────────
 const countdown = computed(() => {
@@ -619,7 +628,7 @@ const countdown = computed(() => {
   return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
 })
 const timer = setInterval(() => { btc.nextBatchMs = Math.max(0, btc.nextBatchMs - 1000) }, 1000)
-onUnmounted(() => { clearInterval(timer); clearInterval(feedTimer) })
+onUnmounted(() => { clearInterval(timer); if (feedTimer) clearInterval(feedTimer) })
 
 // ── 통계 ──────────────────────────────────────────────────
 const heroStats = computed(() => [
