@@ -371,6 +371,113 @@
     </div>
   </section>
 
+  <!-- ── 파트너 채널 라이브 자산 피드 ──────────────────────── -->
+  <section class="py-20 bg-bg-0 border-t border-white/[0.05]">
+    <div class="container">
+      <div class="flex items-end justify-between mb-10 flex-wrap gap-4">
+        <div>
+          <div class="section-tag">📡 LIVE ASSET FEED</div>
+          <h2 class="section-title">파트너 채널 <span>실시간 자산</span></h2>
+          <p class="text-txt-3 text-sm mt-1">kei.bio에서 수신된 자산이 자동으로 업데이트됩니다</p>
+        </div>
+        <!-- 상태 필터 탭 -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <button v-for="f in feedFilters" :key="f.key"
+            @click="feedFilter = f.key; loadFeed()"
+            class="px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
+            :class="feedFilter === f.key
+              ? 'bg-primary text-white'
+              : 'bg-white/5 text-txt-3 hover:bg-white/10'">
+            {{ f.label }}
+          </button>
+          <span class="flex items-center gap-1.5 text-[10px] text-success-light ml-2">
+            <span class="w-1.5 h-1.5 bg-success rounded-full animate-pulse" /> AUTO
+          </span>
+        </div>
+      </div>
+
+      <!-- 스켈레톤 로딩 -->
+      <div v-if="feedLoading && !liveFeed.length"
+           class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+        <div v-for="i in 12" :key="i" class="aspect-[3/4] rounded-xl bg-white/5 animate-pulse" />
+      </div>
+
+      <!-- 피드 그리드 -->
+      <div v-else-if="liveFeed.length"
+           class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+        <div v-for="item in liveFeed" :key="item.declaration_id"
+             class="group cursor-pointer"
+             @click="item.vc_id ? router.push(`/verify?id=${item.vc_id}`) : router.push(`/brand/${item.brand_slug}`)">
+          <!-- 미디어 -->
+          <div class="relative aspect-[3/4] rounded-xl overflow-hidden bg-bg-1 border border-white/[0.06] mb-2">
+            <!-- 영상 -->
+            <template v-if="isVideo(item.source_url, item.asset_class)">
+              <div v-if="feedVideoErrors[item.declaration_id]"
+                   class="w-full h-full flex flex-col items-center justify-center gap-1 opacity-40">
+                <span class="text-3xl">🎬</span>
+                <span class="text-[9px] text-txt-4">영상</span>
+              </div>
+              <template v-else>
+                <video :src="item.source_url" class="w-full h-full object-cover"
+                       muted loop playsinline preload="metadata"
+                       @error="feedVideoErrors[item.declaration_id] = true"
+                       @mouseenter="(e) => (e.target as HTMLVideoElement).play().catch(()=>{})"
+                       @mouseleave="(e) => { (e.target as HTMLVideoElement).pause(); (e.target as HTMLVideoElement).currentTime=0 }" />
+                <div class="absolute inset-0 flex items-center justify-center opacity-50 group-hover:opacity-0 transition-opacity pointer-events-none">
+                  <div class="w-8 h-8 rounded-full bg-black/60 flex items-center justify-center text-white text-sm">▶</div>
+                </div>
+              </template>
+            </template>
+            <!-- 이미지 -->
+            <img v-else-if="item.source_url" :src="item.source_url"
+                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                 @error="(e) => (e.target as HTMLImageElement).style.display='none'" />
+            <div v-else class="w-full h-full flex items-center justify-center text-3xl opacity-20">
+              {{ assetIcon(item.asset_class) }}
+            </div>
+
+            <!-- 상태 배지 (좌상단) -->
+            <div class="absolute top-2 left-2">
+              <span class="badge text-[8px] font-bold"
+                    :class="{
+                      'badge-gold':   item.status === 'pending',
+                      'badge-purple': item.status === 'vc_issued',
+                      'badge-green':  item.btc_status === 'confirmed',
+                    }">
+                {{ item.status === 'pending'   ? '심사 중'
+                 : item.btc_status === 'confirmed' ? '⚓ 각인'
+                 : 'award.bi 인증' }}
+              </span>
+            </div>
+            <!-- 자산 유형 (우상단) -->
+            <div class="absolute top-2 right-2">
+              <span class="badge badge-gray text-[8px]">{{ assetLabel(item.asset_class) }}</span>
+            </div>
+          </div>
+
+          <!-- 텍스트 -->
+          <div class="text-[11px] font-semibold text-txt-1 truncate">{{ item.title ?? item.asset_class }}</div>
+          <div class="text-[10px] text-txt-4 truncate">{{ item.brand_name }}</div>
+        </div>
+      </div>
+
+      <div v-else class="text-center py-12 text-txt-4 text-sm">아직 등록된 자산이 없습니다</div>
+
+      <!-- 더보기 + 갱신 안내 -->
+      <div class="flex items-center justify-between mt-8 flex-wrap gap-3">
+        <button v-if="liveFeed.length >= 24"
+                @click="feedOffset += 24; loadFeed(true)"
+                class="btn btn-outline btn-sm text-xs">
+          더 보기 →
+        </button>
+        <div class="text-[10px] text-txt-4 flex items-center gap-1.5">
+          <span class="w-1 h-1 bg-success rounded-full animate-pulse" />
+          {{ feedLastUpdated ? `마지막 갱신: ${feedLastUpdated}` : '30초마다 자동 갱신' }}
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ── 인증 5단계 여정 ──────────────────────────────────── -->
   <section id="journey" class="py-24 bg-bg-0">
     <div class="container">
@@ -450,7 +557,7 @@
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { useBtcStore } from '@/stores/btc'
-import { getBrandAssets } from '@/api/award'
+import { getBrandAssets, getBrandFeed } from '@/api/award'
 
 const btc    = useBtcStore()
 const router = useRouter()
@@ -470,6 +577,38 @@ async function loadEsco() {
   finally { escoLoading.value = false }
 }
 
+// ── 라이브 피드 ───────────────────────────────────────────
+type FeedItem = {
+  declaration_id: string; status: string; asset_class: string
+  source_url: string; title: string; brand_name: string; brand_slug: string
+  vc_id: string | null; btc_status: string | null; declared_at: string
+}
+const liveFeed        = ref<FeedItem[]>([])
+const feedLoading     = ref(true)
+const feedFilter      = ref('')
+const feedOffset      = ref(0)
+const feedLastUpdated = ref('')
+const feedVideoErrors = ref<Record<string, boolean>>({})
+const feedFilters     = [
+  { key: '',          label: '전체' },
+  { key: 'pending',   label: '심사 중' },
+  { key: 'vc_issued', label: '인증 완료' },
+]
+
+async function loadFeed(append = false) {
+  feedLoading.value = true
+  try {
+    const { data } = await getBrandFeed(24, append ? feedOffset.value : 0, feedFilter.value || undefined)
+    liveFeed.value = append
+      ? [...liveFeed.value, ...(data.feed ?? [])]
+      : (data.feed ?? [])
+    feedLastUpdated.value = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  } catch {} finally { feedLoading.value = false }
+}
+
+// 30초 자동 갱신
+let feedTimer: ReturnType<typeof setInterval>
+
 // ── 카운트다운 ────────────────────────────────────────────
 const countdown = computed(() => {
   const ms = btc.nextBatchMs
@@ -480,7 +619,7 @@ const countdown = computed(() => {
   return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
 })
 const timer = setInterval(() => { btc.nextBatchMs = Math.max(0, btc.nextBatchMs - 1000) }, 1000)
-onUnmounted(() => clearInterval(timer))
+onUnmounted(() => { clearInterval(timer); clearInterval(feedTimer) })
 
 // ── 통계 ──────────────────────────────────────────────────
 const heroStats = computed(() => [
@@ -596,5 +735,11 @@ function isVideo(url?: string, cls?: string): boolean {
   return VIDEO_EXTS.some(ext => url.toLowerCase().includes(ext))
 }
 
-onMounted(() => { loadEsco() })
+onMounted(() => {
+  loadEsco()
+  loadFeed()
+  feedTimer = setInterval(() => {
+    if (feedFilter.value === '' && feedOffset.value === 0) loadFeed()
+  }, 30000)
+})
 </script>
