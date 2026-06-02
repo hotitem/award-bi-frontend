@@ -18,6 +18,7 @@ export const useAuthStore = defineStore('auth', () => {
   const awardToken   = ref(localStorage.getItem('award_bi_token') ?? '')
   const ssumToken    = ref(localStorage.getItem('ssum_user_token') ?? '')
   const loginVisible = ref(false)
+  const isReady      = ref(false)   // restoreSession 완료 여부
 
   const isLoggedIn  = computed(() => !!user.value)
   const isAtelier   = computed(() => ['atelier','admin'].includes(user.value?.role ?? ''))
@@ -25,17 +26,19 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function restoreSession() {
     const token = localStorage.getItem('award_bi_token')
-    if (!token) return false
+    if (!token) { isReady.value = true; return false }
     try {
       const { data } = await authMe()
       if (data.ok) {
         const saved = JSON.parse(localStorage.getItem('award_bi_user') ?? '{}')
         user.value = { ...data.user, ...saved }
         awardToken.value = token
+        isReady.value = true
         return true
       }
     } catch {}
     logout()
+    isReady.value = true
     return false
   }
 
@@ -99,5 +102,6 @@ export const useAuthStore = defineStore('auth', () => {
     user, awardToken, ssumToken, loginVisible,
     isLoggedIn, isAtelier, isAdmin,
     restoreSession, loginWithSsum, loginAsAdmin, logout, openLogin, closeLogin,
+    isReady,
   }
 })

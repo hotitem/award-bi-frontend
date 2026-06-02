@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
@@ -77,6 +78,15 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   const auth = useAuthStore()
 
+  // restoreSession()이 완료될 때까지 대기 (페이지 새로고침 시 race condition 방지)
+  if (!auth.isReady) {
+    await new Promise<void>(resolve => {
+      const unwatch = watch(() => auth.isReady, (ready) => {
+        if (ready) { unwatch(); resolve() }
+      })
+    })
+  }
+
   if (to.meta.requiresAuth && !auth.isLoggedIn) {
     auth.openLogin()
     return false
@@ -85,7 +95,6 @@ router.beforeEach(async (to) => {
   if (to.meta.requiresRole) {
     const roles = to.meta.requiresRole as string[]
     if (!auth.isLoggedIn) {
-      // 미로그인 시 로그인 모달 열고 해당 페이지 유지 (AtelierView가 모달 후 처리)
       auth.openLogin()
       return false
     }

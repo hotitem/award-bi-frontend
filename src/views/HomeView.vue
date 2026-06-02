@@ -398,13 +398,13 @@
 
       <!-- 스켈레톤 로딩 -->
       <div v-if="feedLoading && !liveFeed.length"
-           class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+           class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 min-h-[200px]">
         <div v-for="i in 12" :key="i" class="aspect-[3/4] rounded-xl bg-white/5 animate-pulse" />
       </div>
 
       <!-- 피드 그리드 -->
       <div v-else-if="liveFeed.length"
-           class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+           class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 min-h-[200px]">
         <div v-for="item in liveFeed" :key="item.declaration_id"
              class="group cursor-pointer"
              @click="item.vc_id ? router.push(`/verify?id=${item.vc_id}`) : router.push(`/brand/${item.brand_slug}`)">
