@@ -1,2 +1,6 @@
 /v/:id  /s/:id  301
+
+# 단일 브랜드 페이지는 SPA로 처리(legacy html 우선순위 방지)
+/brand/*  /index.html  200
+
 /*  /index.html  200
