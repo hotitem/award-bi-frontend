@@ -82,7 +82,7 @@ git push origin main
 - Bitcoin 블록 외부 링크 (mempool.space, blockstream, blockchain.com)
 - URL 파라미터: `https://award.bi/verify?id=vc-esco-001`
 
-### brand/esco.html — ESCO 브랜드
+### brand/esco — ESCO 브랜드 (SPA route `/brand/:slug`)
 - SBT 7종 + NFT 정품인증 1종 (수량 1,000개)
 - Bitcoin 각인 이력 테이블
 - 맞팔 회원 전용 잠금 카드
@@ -105,8 +105,8 @@ const data = await res.json();
 ## ↩️ URL 리디렉트 (`_redirects`)
 
 ```
-/brand    /brand/esco.html   302
-/esco     /brand/esco.html   301
+/brand    /brand/esco   302
+/esco     /brand/esco   301
 /verify   /verify.html       301
 /v/:id    /verify.html?id=:id 301
 ```
