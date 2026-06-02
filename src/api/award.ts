@@ -29,6 +29,7 @@ award.interceptors.response.use(
 
 // ── Auth ──────────────────────────────────────
 export const authSsumLogin   = (user_token: string)                 => award.post('/auth/ssum/login', { user_token })
+export const authAdminLogin  = (email: string, password: string)    => award.post('/auth/admin/login', { email, password })
 export const authMe          = ()                                    => award.get('/auth/me')
 export const authLogout      = ()                                    => award.post('/auth/logout')
 
