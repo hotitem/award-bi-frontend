@@ -166,8 +166,8 @@ const formatDate = (d: string) => new Date(d).toLocaleString('ko-KR', { dateStyl
 const metrics = computed(() => {
   return [
     { label: '승인 대기', value: counts.value.pending || 0, icon: ClockIcon, iconClass: 'text-gold' },
-    { label: 'VC 발행완료', value: counts.value.vc_issued || 0, icon: DocumentCheckIcon, iconClass: 'text-primary-light' },
-    { label: 'BTC 최종확정', value: counts.value.confirmed || 0, icon: ShieldCheckIcon, iconClass: 'text-success-light' },
+    { label: 'VC 발행완료', value: Math.max(0, (counts.value.vc_issued || 0) - (counts.value.confirmed || 0)), icon: DocumentCheckIcon, iconClass: 'text-primary-light' },
+    { label: 'BTC 각인완료', value: counts.value.confirmed || 0, icon: ShieldCheckIcon, iconClass: 'text-success-light' },
     { label: '거절 건수', value: counts.value.failed || 0, icon: NoSymbolIcon, iconClass: 'text-txt-4' },
   ]
 })
