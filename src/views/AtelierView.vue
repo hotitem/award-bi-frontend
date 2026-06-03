@@ -55,7 +55,7 @@
             ]"
           >
             {{ tabLabel(tab) }}
-            <span class="ml-1 opacity-50 text-xs">{{ (counts && typeof counts[tab] === 'number') ? counts[tab] : 0 }}</span>
+            <span class="ml-1 opacity-50 text-xs">{{ counts?.[tab] || 0 }}</span>
           </button>
         </div>
 
@@ -177,8 +177,8 @@ const getItemStatusClass = (item: any) => {
 const metrics = computed(() => {
   return [
     { label: '승인 대기', value: counts.value.pending || 0, icon: ClockIcon, iconClass: 'text-gold' },
-    { label: 'VC 발행 (배치 대기)', value: Math.max(0, (Number(counts.value.vc_issued) || 0) - (Number(counts.value.confirmed) || 0)), icon: DocumentCheckIcon, iconClass: 'text-primary-light' },
-    { label: 'BTC 각인 완료', value: Number(counts.value.confirmed) || 0, icon: ShieldCheckIcon, iconClass: 'text-success-light' },
+    { label: 'VC 발행 (배치 대기)', value: Math.max(0, (parseInt(String(counts.value.vc_issued || 0))) - (parseInt(String(counts.value.confirmed || 0)))), icon: DocumentCheckIcon, iconClass: 'text-primary-light' },
+    { label: 'BTC 각인 완료', value: parseInt(String(counts.value.confirmed || 0)), icon: ShieldCheckIcon, iconClass: 'text-success-light' },
     { label: '거절 건수', value: counts.value.failed || 0, icon: NoSymbolIcon, iconClass: 'text-txt-4' },
   ]
 })
