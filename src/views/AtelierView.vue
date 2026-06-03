@@ -84,7 +84,7 @@
                       <span class="text-xs text-txt-4">{{ item.asset_class }}</span>
                     </div>
                   </div>
-                  <div :class="['badge py-1 px-3', getItemStatusClass(item)]">{{ getItemStatusLabel(item) }}</div>
+                  <div :class="['badge py-1.5 px-4 font-bold', getItemStatusClass(item)]">{{ getItemStatusLabel(item) }}</div>
                 </div>
 
                 <!-- 프로세스 타임라인 -->
@@ -164,21 +164,25 @@ const statusClass = (s: string) => ({ pending: 'badge-gold', vc_issued: 'badge-p
 const formatDate = (d: string) => new Date(d).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' })
 
 const getItemStatusLabel = (item: any) => {
-  if (item.status === 'vc_issued' && item.ots_status === 'confirmed') return '각인완료'
-  if (item.status === 'vc_issued' && item.ots_status === 'submitted') return '각인진행중'
+  if (item.status === 'vc_issued') {
+    if (item.ots_status === 'confirmed') return 'Bitcoin 각인 완료'
+    if (item.ots_status === 'submitted') return '각인 진행 중'
+    return 'VC 발행 (배치 대기)'
+  }
   return statusLabel(item.status)
 }
 const getItemStatusClass = (item: any) => {
   if (item.status === 'vc_issued' && item.ots_status === 'confirmed') return 'badge-green'
   if (item.status === 'vc_issued' && item.ots_status === 'submitted') return 'badge-gold'
+  if (item.status === 'vc_issued') return 'badge-purple'
   return statusClass(item.status)
 }
 
 const metrics = computed(() => {
   return [
     { label: '승인 대기', value: counts.value.pending || 0, icon: ClockIcon, iconClass: 'text-gold' },
-    { label: 'VC 발행 (배치 대기)', value: Math.max(0, (parseInt(String(counts.value.vc_issued || 0))) - (parseInt(String(counts.value.confirmed || 0)))), icon: DocumentCheckIcon, iconClass: 'text-primary-light' },
-    { label: 'BTC 각인 완료', value: parseInt(String(counts.value.confirmed || 0)), icon: ShieldCheckIcon, iconClass: 'text-success-light' },
+    { label: 'VC 발행 (배치 대기)', value: Math.max(0, (Number(counts.value.vc_issued) || 0) - (Number(counts.value.confirmed) || 0)), icon: DocumentCheckIcon, iconClass: 'text-primary-light' },
+    { label: 'BTC 각인 완료', value: Number(counts.value.confirmed) || 0, icon: ShieldCheckIcon, iconClass: 'text-success-light' },
     { label: '거절 건수', value: counts.value.failed || 0, icon: NoSymbolIcon, iconClass: 'text-txt-4' },
   ]
 })
