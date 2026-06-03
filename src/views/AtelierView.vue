@@ -55,7 +55,7 @@
             ]"
           >
             {{ tabLabel(tab) }}
-            <span class="ml-1 opacity-50 text-xs">{{ counts[tab] || 0 }}</span>
+            <span class="ml-1 opacity-50 text-xs">{{ (counts && typeof counts[tab] === 'number') ? counts[tab] : 0 }}</span>
           </button>
         </div>
 
@@ -163,11 +163,22 @@ const statusLabel = (s: string) => ({ pending: '대기중', vc_issued: '발행�
 const statusClass = (s: string) => ({ pending: 'badge-gold', vc_issued: 'badge-purple', failed: 'badge-gray', approved: 'badge-green' }[s])
 const formatDate = (d: string) => new Date(d).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' })
 
+const getItemStatusLabel = (item: any) => {
+  if (item.status === 'vc_issued' && item.ots_status === 'confirmed') return '각인완료'
+  if (item.status === 'vc_issued' && item.ots_status === 'submitted') return '각인진행중'
+  return statusLabel(item.status)
+}
+const getItemStatusClass = (item: any) => {
+  if (item.status === 'vc_issued' && item.ots_status === 'confirmed') return 'badge-green'
+  if (item.status === 'vc_issued' && item.ots_status === 'submitted') return 'badge-gold'
+  return statusClass(item.status)
+}
+
 const metrics = computed(() => {
   return [
     { label: '승인 대기', value: counts.value.pending || 0, icon: ClockIcon, iconClass: 'text-gold' },
-    { label: 'VC 발행완료', value: Math.max(0, (counts.value.vc_issued || 0) - (counts.value.confirmed || 0)), icon: DocumentCheckIcon, iconClass: 'text-primary-light' },
-    { label: 'BTC 각인완료', value: counts.value.confirmed || 0, icon: ShieldCheckIcon, iconClass: 'text-success-light' },
+    { label: 'VC 발행 (배치 대기)', value: Math.max(0, (counts.value.vc_issued || 0) - (counts.value.confirmed || 0)), icon: DocumentCheckIcon, iconClass: 'text-primary-light' },
+    { label: 'BTC 각인 완료', value: counts.value.confirmed || 0, icon: ShieldCheckIcon, iconClass: 'text-success-light' },
     { label: '거절 건수', value: counts.value.failed || 0, icon: NoSymbolIcon, iconClass: 'text-txt-4' },
   ]
 })
