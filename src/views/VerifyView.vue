@@ -36,17 +36,25 @@
 
       <!-- 텍스트 검색 결과 (목록) -->
       <div v-if="searchResults.length" class="space-y-3">
-        <p class="text-xs text-txt-4 mb-4">검색 결과 {{ searchResults.length }}건 — 자산을 선택하세요</p>
+        <p class="text-xs text-txt-4 mb-4">검색 결과 <strong class="text-txt-2">{{ searchResults.length }}건</strong> — 자산을 선택하면 상세 인증 추적을 볼 수 있습니다</p>
         <div v-for="item in searchResults" :key="item.vc_id"
              @click="selectResult(item.vc_id)"
-             class="card p-4 cursor-pointer hover:border-primary/40 transition-all flex items-center gap-4">
-          <img v-if="item.source_url" :src="item.source_url" class="w-14 h-14 rounded-lg object-cover shrink-0" />
-          <div v-else class="w-14 h-14 rounded-lg bg-white/5 flex items-center justify-center shrink-0 text-2xl">📄</div>
+             class="card p-4 cursor-pointer hover:border-primary/40 transition-all flex items-center gap-4 group">
+          <img v-if="item.source_url" :src="item.source_url" class="w-16 h-16 rounded-xl object-cover shrink-0 border border-white/10" />
+          <div v-else class="w-16 h-16 rounded-xl bg-white/5 flex items-center justify-center shrink-0 text-2xl border border-white/5">📄</div>
           <div class="flex-1 min-w-0">
-            <div class="font-bold text-txt-1 truncate">{{ item.asset_metadata?.title || item.asset_class }}</div>
-            <div class="text-xs text-txt-4 mt-0.5">{{ item.brand_name }} · {{ item.token_type }}</div>
+            <div class="font-bold text-txt-1 truncate text-base">{{ item.asset_metadata?.title || item.asset_metadata?.name || item.asset_class }}</div>
+            <div class="flex items-center gap-2 mt-1 flex-wrap">
+              <span v-if="item.brand_name" class="text-xs text-txt-4">🏷 {{ item.brand_name }}</span>
+              <span class="badge badge-purple text-[10px]">{{ item.token_type }}</span>
+              <!-- BTC 각인 상태 -->
+              <span v-if="item.ots_status === 'confirmed'" class="badge badge-green text-[10px]">⛓ BTC 각인 완료</span>
+              <span v-else-if="item.ots_status === 'submitted'" class="badge badge-gold text-[10px]">⏳ 각인 진행 중</span>
+              <span v-else-if="item.batch_id" class="text-[10px] text-txt-4">배치 등록됨</span>
+            </div>
+            <div class="text-[10px] text-txt-4 mt-1 font-mono truncate">{{ item.vc_hash?.slice(0, 24) }}...</div>
           </div>
-          <span class="text-primary text-xs">조회 →</span>
+          <span class="text-primary text-xs opacity-0 group-hover:opacity-100 transition-opacity shrink-0">추적 →</span>
         </div>
       </div>
 
