@@ -44,18 +44,20 @@
         </div>
 
         <!-- 탭 네비게이션 -->
-        <div class="flex gap-2 mb-6 border-b border-white/5">
-          <button 
-            v-for="tab in ['pending', 'vc_issued', 'failed', 'all']" 
+        <div class="flex gap-2 mb-6 border-b border-white/5 overflow-x-auto">
+          <button
+            v-for="tab in TABS"
             :key="tab"
             @click="currentTab = tab; load()"
             :class="[
-              'px-6 py-3 text-sm font-bold transition-all border-b-2',
+              'px-5 py-3 text-sm font-bold transition-all border-b-2 whitespace-nowrap',
               currentTab === tab ? 'border-primary text-primary' : 'border-transparent text-txt-3 hover:text-txt-1'
             ]"
           >
             {{ tabLabel(tab) }}
-            <span class="ml-1 opacity-50 text-xs">{{ counts?.[tab] || 0 }}</span>
+            <span :class="['ml-1 text-xs rounded-full px-1.5 py-0.5', tabCount(tab) > 0 ? 'bg-primary/20 text-primary' : 'opacity-40']">
+              {{ tabCount(tab) }}
+            </span>
           </button>
         </div>
 
@@ -105,11 +107,18 @@
 
                   <div class="text-[11px] border-l border-white/10 pl-4">
                     <div class="text-txt-4 mb-1">STEP 3. BTC 각인</div>
-                    <div v-if="item.ots_status" class="flex items-center gap-1.5">
-                      <span :class="['w-1.5 h-1.5 rounded-full', item.ots_status === 'confirmed' ? 'bg-success' : 'bg-gold animate-pulse']"></span>
-                      <span :class="item.ots_status === 'confirmed' ? 'text-success' : 'text-gold'">{{ item.ots_status.toUpperCase() }}</span>
-                      <a v-if="item.btc_tx_hash" :href="`https://mempool.space/tx/${item.btc_tx_hash}`" target="_blank" class="ml-1 opacity-50 hover:opacity-100">↗</a>
+                    <div v-if="item.ots_status === 'confirmed'" class="flex items-center gap-1.5">
+                      <span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+                      <span class="text-success font-bold">CONFIRMED</span>
+                      <span v-if="item.btc_block_height" class="text-txt-4">#{{ item.btc_block_height }}</span>
+                      <a v-if="item.ots_btc_txid" :href="`https://mempool.space/tx/${item.ots_btc_txid}`" target="_blank" class="ml-1 opacity-50 hover:opacity-100 text-primary">↗ TX</a>
                     </div>
+                    <div v-else-if="item.ots_status === 'submitted'" class="flex items-center gap-1.5">
+                      <span class="w-1.5 h-1.5 rounded-full bg-gold animate-pulse"></span>
+                      <span class="text-gold">SUBMITTED</span>
+                      <span class="text-txt-4 italic">(블록 확인 대기)</span>
+                    </div>
+                    <div v-else-if="item.batch_id" class="text-txt-4 italic">배치 등록됨</div>
                     <div v-else class="text-txt-4 italic">배치 대기</div>
                   </div>
                 </div>
@@ -147,30 +156,57 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { getDeclarations, approveDeclaration, rejectDeclaration, runBatch } from '@/api/award'
+import { getDeclarations, approveDecl, rejectDecl, runBatch } from '@/api/award'
 import { ArrowPathIcon, BoltIcon, ClockIcon, DocumentCheckIcon, ShieldCheckIcon, NoSymbolIcon } from '@heroicons/vue/24/outline'
 
 const auth = useAuthStore()
 const loading = ref(false)
 const batchRunning = ref(false)
-const currentTab = ref('pending')
+const currentTab = ref('all')
 const items = ref<any[]>([])
 const counts = ref<Record<string, number>>({})
 const processing = ref<Record<string, string>>({})
 
-const tabLabel = (t: string) => ({ pending: '승인 대기', vc_issued: 'VC 발행완료', failed: '거절됨', all: '전체' }[t])
-const statusLabel = (s: string) => ({ pending: '대기중', vc_issued: '발행완료', failed: '거절됨', approved: '승인됨' }[s])
-const statusClass = (s: string) => ({ pending: 'badge-gold', vc_issued: 'badge-purple', failed: 'badge-gray', approved: 'badge-green' }[s])
+const TABS = ['all', 'pending', 'vc_issued', 'btc_confirmed', 'failed'] as const
+
+const tabLabel = (t: string) => ({
+  all:           '전체',
+  pending:       '승인 대기',
+  vc_issued:     'VC 발행',
+  btc_confirmed: 'BTC 각인',
+  failed:        '거절됨',
+}[t] ?? t)
+
+const tabCount = (t: string) => {
+  if (t === 'all') return counts.value.total ?? 0
+  return counts.value[t] ?? 0
+}
+
+const statusLabel = (s: string) => ({
+  pending:   '대기중',
+  vc_issued: '발행완료',
+  failed:    '거절됨',
+  approved:  '승인됨',
+}[s] ?? s)
+
+const statusClass = (s: string) => ({
+  pending:   'badge-gold',
+  vc_issued: 'badge-purple',
+  failed:    'badge-gray',
+  approved:  'badge-green',
+}[s] ?? 'badge-gray')
+
 const formatDate = (d: string) => new Date(d).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' })
 
 const getItemStatusLabel = (item: any) => {
   if (item.status === 'vc_issued') {
-    if (item.ots_status === 'confirmed') return 'Bitcoin 각인 완료'
-    if (item.ots_status === 'submitted') return '각인 진행 중'
-    return 'VC 발행 (배치 대기)'
+    if (item.ots_status === 'confirmed') return '⛓ Bitcoin 각인 완료'
+    if (item.ots_status === 'submitted') return '⏳ 각인 진행 중'
+    return '✅ VC 발행완료'
   }
   return statusLabel(item.status)
 }
+
 const getItemStatusClass = (item: any) => {
   if (item.status === 'vc_issued' && item.ots_status === 'confirmed') return 'badge-green'
   if (item.status === 'vc_issued' && item.ots_status === 'submitted') return 'badge-gold'
@@ -178,14 +214,12 @@ const getItemStatusClass = (item: any) => {
   return statusClass(item.status)
 }
 
-const metrics = computed(() => {
-  return [
-    { label: '승인 대기', value: counts.value.pending || 0, icon: ClockIcon, iconClass: 'text-gold' },
-    { label: 'VC 발행 (배치 대기)', value: Math.max(0, (Number(counts.value.vc_issued) || 0) - (Number(counts.value.confirmed) || 0)), icon: DocumentCheckIcon, iconClass: 'text-primary-light' },
-    { label: 'BTC 각인 완료', value: Number(counts.value.confirmed) || 0, icon: ShieldCheckIcon, iconClass: 'text-success-light' },
-    { label: '거절 건수', value: counts.value.failed || 0, icon: NoSymbolIcon, iconClass: 'text-txt-4' },
-  ]
-})
+const metrics = computed(() => [
+  { label: '승인 대기',        value: counts.value.pending       ?? 0, icon: ClockIcon,         iconClass: 'text-gold' },
+  { label: 'VC 발행 (BTC 대기)', value: Math.max(0, (counts.value.vc_issued ?? 0) - (counts.value.btc_confirmed ?? 0)), icon: DocumentCheckIcon, iconClass: 'text-primary-light' },
+  { label: 'BTC 각인 완료',    value: counts.value.btc_confirmed ?? 0, icon: ShieldCheckIcon,   iconClass: 'text-success-light' },
+  { label: '거절 건수',        value: counts.value.failed        ?? 0, icon: NoSymbolIcon,      iconClass: 'text-txt-4' },
+])
 
 async function load() {
   if (!auth.isAtelier) return
@@ -206,7 +240,7 @@ async function approve(id: string) {
   if (!confirm('승인하시겠습니까? 즉시 VC가 발행되고 BTC 각인 배치가 시작됩니다.')) return
   processing.value[id] = 'approve'
   try {
-    await approveDeclaration(id)
+    await approveDecl(id)
     await load()
   } catch (e: any) {
     alert('승인 실패: ' + (e.response?.data?.detail || e.message))
@@ -220,7 +254,7 @@ async function reject(id: string) {
   if (!reason) return
   processing.value[id] = 'reject'
   try {
-    await rejectDeclaration(id, reason)
+    await rejectDecl(id, reason)
     await load()
   } finally {
     delete processing.value[id]
