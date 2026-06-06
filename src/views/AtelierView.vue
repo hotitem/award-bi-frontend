@@ -172,8 +172,8 @@ const TABS = ['all', 'pending', 'vc_issued', 'btc_confirmed', 'failed'] as const
 const tabLabel = (t: string) => ({
   all:           '전체',
   pending:       '승인 대기',
-  vc_issued:     'VC 발행',
-  btc_confirmed: 'BTC 각인',
+  vc_issued:     'BTC 각인 대기',
+  btc_confirmed: 'BTC 각인 완료',
   failed:        '거절됨',
 }[t] ?? t)
 
