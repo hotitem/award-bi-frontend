@@ -262,20 +262,38 @@
                     <span class="detail-label">확정 시각</span>
                     <span class="detail-val">{{ formatDate(result.bitcoin.confirmed_at) }}</span>
                   </div>
+                  <div v-if="blockHash" class="detail-row">
+                    <span class="detail-label">블록 해시</span>
+                    <span class="detail-val font-mono text-[10px] truncate">{{ blockHash }}</span>
+                  </div>
+                  <div v-if="result.bitcoin.ots_btc_txid" class="detail-row">
+                    <span class="detail-label">Bitcoin TxID</span>
+                    <span class="detail-val font-mono text-[10px] truncate text-gold">{{ result.bitcoin.ots_btc_txid }}</span>
+                  </div>
                   <!-- 외부 블록 탐색기 링크 -->
                   <div class="mt-3 flex flex-wrap gap-2">
-                    <a :href="`https://mempool.space/block-height/${result.bitcoin.btc_block_height}`"
-                       target="_blank" class="btn btn-gold btn-sm text-xs font-bold">
-                      ⛓ mempool.space 블록 조회 ↗
-                    </a>
-                    <a :href="`https://blockstream.info/block-height/${result.bitcoin.btc_block_height}`"
-                       target="_blank" class="btn btn-outline btn-sm text-xs">
-                      Blockstream ↗
+                    <template v-if="blockHash">
+                      <a :href="`https://mempool.space/block/${blockHash}`"
+                         target="_blank" class="btn btn-gold btn-sm text-xs font-bold">
+                        ⛓ mempool.space 블록 #{{ Number(result.bitcoin.btc_block_height).toLocaleString() }} ↗
+                      </a>
+                      <a :href="`https://blockstream.info/block/${blockHash}`"
+                         target="_blank" class="btn btn-outline btn-sm text-xs">
+                        Blockstream ↗
+                      </a>
+                    </template>
+                    <span v-else class="text-xs text-txt-4 flex items-center gap-1.5">
+                      <span class="w-3 h-3 border-2 border-gold/50 border-t-gold rounded-full animate-spin inline-block"></span>
+                      블록 해시 조회 중...
+                    </span>
+                    <a v-if="result.bitcoin.ots_btc_txid"
+                       :href="`https://mempool.space/tx/${result.bitcoin.ots_btc_txid}`"
+                       target="_blank" class="btn btn-outline btn-sm text-xs border-gold/40 text-gold">
+                      🔗 Bitcoin 트랜잭션 직접 확인 ↗
                     </a>
                   </div>
                   <p class="text-[10px] text-txt-4 mt-2">
-                    💡 블록 탐색기에서 블록 높이 #{{ result.bitcoin.btc_block_height }}을 열면
-                    이 자산이 포함된 배치의 타임스탬프가 포함된 Bitcoin 트랜잭션을 확인할 수 있습니다.
+                    💡 블록 탐색기에서 블록 #{{ result.bitcoin.btc_block_height }}을 열면 이 배치의 OTS 타임스탬프가 포함된 Bitcoin OP_RETURN 트랜잭션을 확인할 수 있습니다.
                   </p>
                 </div>
                 <div v-else-if="result.bitcoin?.ots_status === 'submitted'" class="mt-3 p-3 bg-gold/10 border border-gold/20 rounded-lg">
@@ -325,7 +343,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { verifySearch, verifyById } from '@/api/award'
@@ -337,6 +355,21 @@ const loading      = ref(false)
 const error        = ref('')
 const result       = ref<Record<string, any> | null>(null)
 const searchResults = ref<any[]>([])
+const blockHash    = ref('')
+
+// 블록 높이 → 실제 블록 해시 (mempool.space API)
+watch(result, async (newResult) => {
+  blockHash.value = ''
+  const height = newResult?.bitcoin?.btc_block_height
+  if (!height) return
+  try {
+    const res = await fetch(`https://mempool.space/api/block-height/${height}`)
+    if (res.ok) {
+      const h = (await res.text()).trim()
+      if (h && h.length === 64) blockHash.value = h
+    }
+  } catch {}
+})
 
 const INVALID_IDS = new Set(['null', 'undefined', '', '0'])
 
