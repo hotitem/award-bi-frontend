@@ -12,7 +12,7 @@
       </div>
 
       <div v-else>
-        <header class="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
+        <header class="sticky top-0 z-20 bg-bg-0 flex flex-col md:flex-row md:items-center justify-between py-4 mb-6 gap-4 border-b border-white/5">
           <div>
             <h1 class="text-2xl font-black text-txt-1 mb-1">🎨 아뜰리에 작업대</h1>
             <p class="text-sm text-txt-3">승인 대기 중인 자산을 검토하고 Bitcoin 각인을 관리합니다.</p>
@@ -119,7 +119,12 @@
                       <span class="text-txt-4 italic">(블록 확인 대기)</span>
                     </div>
                     <div v-else-if="item.batch_id" class="text-txt-4 italic">배치 등록됨</div>
-                    <div v-else class="text-txt-4 italic">배치 대기</div>
+                    <div v-else class="flex items-center gap-2">
+                      <span class="text-txt-4 italic">배치 대기</span>
+                      <button @click="runBitcoinBatch" :disabled="batchRunning" class="text-[10px] px-2 py-0.5 rounded bg-gold/20 text-gold hover:bg-gold/30 transition-colors font-bold">
+                        {{ batchRunning ? '처리중...' : '⚡ 즉시 실행' }}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
