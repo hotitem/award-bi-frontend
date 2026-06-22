@@ -45,7 +45,8 @@ export const getStats        = ()                                    => award.ge
 // ── Brands ────────────────────────────────────
 export const getBrand        = (slug: string)                        => award.get(`/brands/${slug}`)
 export const getBrandAssets  = (slug: string, limit = 20)            => award.get(`/brands/${slug}/assets`, { params: { limit } })
-export const getBrandFeed    = (limit = 24, offset = 0, status?: string) => award.get('/brands/feed', { params: { limit, offset, status } })
+export const getBrandFeed     = (limit = 24, offset = 0, status?: string) => award.get('/brands/feed',     { params: { limit, offset, status } })
+export const getBrandShowcase = (limit = 6)                               => award.get('/brands/showcase', { params: { limit } })
 
 // ── My Assets ─────────────────────────────────
 export const myAssets        = ()                                    => award.get('/my/assets')

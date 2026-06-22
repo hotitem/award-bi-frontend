@@ -280,7 +280,7 @@
     </div>
   </section>
 
-  <!-- ── Featured Brand (ESCO 실시간) ─────────────────────── -->
+  <!-- ── Featured Brand 쇼케이스 (동적 멀티브랜드) ─────────── -->
   <section class="py-24 bg-bg-1">
     <div class="container">
       <div class="text-center mb-12">
@@ -289,88 +289,89 @@
         <p class="text-txt-3">award.bi 아뜰리에가 인증한 K-Beauty 브랜드의 자산을 확인하세요</p>
       </div>
 
-      <div class="card p-6 max-w-4xl mx-auto">
-        <!-- ESCO 브랜드 헤더 -->
-        <div class="flex items-center gap-5 mb-8 flex-wrap">
-          <div class="w-16 h-16 rounded-xl bg-primary/20 flex items-center justify-center text-3xl shrink-0">🧴</div>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 flex-wrap mb-1">
-              <h3 class="text-xl font-black text-txt-1">ESCO</h3>
-              <span class="badge badge-green text-[10px]">✓ Kei 공식인증</span>
-              <span class="badge badge-purple text-[10px]">⭐ award.bi 아뜰리에</span>
+      <!-- 스켈레톤 -->
+      <div v-if="showcaseLoading" class="space-y-6 max-w-4xl mx-auto">
+        <div v-for="i in 2" :key="i" class="card p-6">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="w-14 h-14 rounded-xl bg-white/5 animate-pulse" />
+            <div class="flex-1 space-y-2">
+              <div class="h-4 w-32 bg-white/5 rounded animate-pulse" />
+              <div class="h-3 w-48 bg-white/5 rounded animate-pulse" />
             </div>
-            <p class="text-xs text-txt-3">escobeauty.co.kr · K-Beauty 스킨케어 브랜드 · 제주 감귤 성분 특화</p>
           </div>
-          <div class="flex items-center gap-6 shrink-0">
-            <div class="text-center">
-              <div class="text-2xl font-black text-primary-light">{{ escoAssets.length }}</div>
-              <div class="text-[10px] text-txt-4">SBT</div>
-            </div>
-            <div class="text-center">
-              <div class="text-2xl font-black text-gold">{{ escoConfirmed }}</div>
-              <div class="text-[10px] text-txt-4">각인</div>
-            </div>
-            <RouterLink to="/brand/esco" class="btn btn-outline btn-sm">전체 보기 →</RouterLink>
+          <div class="grid grid-cols-4 gap-3">
+            <div v-for="j in 4" :key="j" class="aspect-[3/4] rounded-xl bg-white/5 animate-pulse" />
           </div>
         </div>
+      </div>
 
-        <!-- 자산 그리드 -->
-        <div v-if="escoAssets.length" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div v-for="asset in escoAssets.slice(0,4)" :key="asset.declaration_id"
-               class="cursor-pointer group" @click="router.push(`/verify?id=${asset.vc_id}`)">
-            <div class="relative aspect-[3/4] rounded-xl overflow-hidden bg-bg-0 border border-white/5 mb-2">
-              <!-- 영상 자산 -->
-              <template v-if="isVideo(asset.source_url as string, asset.asset_class as string)">
-                <div v-if="homeVideoErrors[asset.declaration_id as string]"
-                     class="w-full h-full flex flex-col items-center justify-center gap-1">
-                  <span class="text-3xl">🎬</span>
-                  <span class="text-[9px] text-txt-4">브랜드 영상</span>
+      <!-- 브랜드 카드 목록 -->
+      <div v-else class="space-y-6 max-w-4xl mx-auto">
+        <div v-for="brand in showcaseBrands" :key="brand.slug" class="card p-6">
+          <!-- 브랜드 헤더 -->
+          <div class="flex items-center gap-5 mb-6 flex-wrap">
+            <div class="w-14 h-14 rounded-xl bg-primary/20 flex items-center justify-center text-2xl shrink-0">
+              {{ brandIcon(brand.slug) }}
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap mb-1">
+                <h3 class="text-lg font-black text-txt-1">{{ brandDisplayName(brand) }}</h3>
+                <span class="badge badge-green text-[10px]">✓ Kei 공식인증</span>
+                <span class="badge badge-purple text-[10px]">⭐ award.bi 아뜰리에</span>
+              </div>
+              <p class="text-xs text-txt-3">kei.bio/{{ brand.slug }}</p>
+            </div>
+            <div class="flex items-center gap-5 shrink-0">
+              <div class="text-center">
+                <div class="text-xl font-black text-primary-light">{{ brand.sbt_count }}</div>
+                <div class="text-[10px] text-txt-4">SBT</div>
+              </div>
+              <div class="text-center">
+                <div class="text-xl font-black text-gold">{{ brand.btc_count }}</div>
+                <div class="text-[10px] text-txt-4">각인</div>
+              </div>
+              <RouterLink :to="`/brand/${brand.slug}`" class="btn btn-outline btn-sm">전체 보기 →</RouterLink>
+            </div>
+          </div>
+
+          <!-- 자산 그리드 -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div v-for="asset in brand.assets.slice(0,4)" :key="asset.declaration_id"
+                 class="cursor-pointer group"
+                 @click="asset.vc_id ? router.push(`/verify?id=${asset.vc_id}`) : undefined">
+              <div class="relative aspect-[3/4] rounded-xl overflow-hidden bg-bg-0 border border-white/5 mb-2">
+                <img v-if="asset.source_url"
+                     :src="(asset.asset_metadata as Record<string,string>)?.image_url || asset.source_url"
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                     @error="(e) => (e.target as HTMLImageElement).style.display='none'" />
+                <div v-else class="w-full h-full flex items-center justify-center text-3xl opacity-30">
+                  {{ assetIcon(asset.asset_class as string) }}
                 </div>
-                <template v-else>
-                  <video :src="asset.source_url as string"
-                         class="w-full h-full object-cover"
-                         muted loop playsinline preload="metadata"
-                         @error="homeVideoErrors[asset.declaration_id as string] = true"
-                         @mouseenter="(e) => (e.target as HTMLVideoElement).play().catch(()=>{})"
-                         @mouseleave="(e) => { (e.target as HTMLVideoElement).pause(); (e.target as HTMLVideoElement).currentTime = 0 }" />
-                  <div class="absolute inset-0 flex items-center justify-center opacity-60 group-hover:opacity-0 transition-opacity pointer-events-none">
-                    <div class="w-10 h-10 rounded-full bg-black/60 flex items-center justify-center text-white">▶</div>
-                  </div>
-                </template>
-              </template>
-              <!-- 이미지 자산 -->
-              <img v-else-if="asset.source_url" :src="asset.source_url as string"
-                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-              <div v-else class="w-full h-full flex items-center justify-center text-4xl opacity-30">
-                {{ assetIcon(asset.asset_class as string) }}
+                <div class="absolute top-2 left-2">
+                  <span class="badge badge-purple text-[9px]">{{ assetLabel(asset.asset_class as string) }}</span>
+                </div>
+                <div class="absolute top-2 right-2">
+                  <span class="badge badge-gold text-[9px]">⭐ award.bi</span>
+                </div>
+                <div class="absolute bottom-2 left-2">
+                  <span class="badge badge-purple text-[9px]">⭐ {{ asset.token_category }}</span>
+                </div>
               </div>
-
-              <div class="absolute top-2 left-2">
-                <span class="badge badge-purple text-[9px]">{{ assetLabel(asset.asset_class as string) }}</span>
+              <div class="text-xs font-semibold text-txt-1 truncate mb-1">
+                {{ (asset.asset_metadata as Record<string,string>)?.title ?? asset.asset_class }}
               </div>
-              <div class="absolute top-2 right-2">
-                <span class="badge badge-gold text-[9px]">⭐ award.bi</span>
+              <div class="flex gap-1 flex-wrap">
+                <span class="badge badge-green text-[9px]">⭐ award.bi 인증</span>
+                <span class="badge badge-gold text-[9px]">🔍 {{ asset.token_category }}</span>
               </div>
-              <div class="absolute bottom-2 left-2">
-                <span class="badge badge-purple text-[9px]">⭐ {{ asset.token_category }}</span>
-              </div>
-            </div>
-            <div class="text-xs font-semibold text-txt-1 truncate mb-1">
-              {{ (asset.asset_metadata as Record<string,string>)?.title ?? asset.asset_class }}
-            </div>
-            <div class="flex gap-1 flex-wrap">
-              <span class="badge badge-green text-[9px]">⭐ award.bi 인증</span>
-              <span class="badge badge-gold text-[9px]">🔍 {{ asset.token_category }}</span>
             </div>
           </div>
-        </div>
-        <div v-else-if="escoLoading" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div v-for="i in 4" :key="i" class="aspect-[3/4] rounded-xl bg-white/5 animate-pulse" />
-        </div>
 
-        <RouterLink to="/brand/esco" class="block text-center text-sm text-primary-light hover:underline mt-6">
-          ESCO 전체 인증 자산 보기 →
-        </RouterLink>
+          <RouterLink :to="`/brand/${brand.slug}`"
+                      class="block text-center text-sm text-primary-light hover:underline mt-4">
+            {{ brandDisplayName(brand) }} 전체 인증 자산 보기 →
+          </RouterLink>
+        </div>
       </div>
     </div>
   </section>
@@ -566,24 +567,45 @@
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { useBtcStore } from '@/stores/btc'
-import { getBrandAssets, getBrandFeed } from '@/api/award'
+import { getBrandFeed, getBrandShowcase } from '@/api/award'
 
 const btc    = useBtcStore()
 const router = useRouter()
 
-// ── ESCO 실시간 데이터 ──────────────────────────────────────
-const escoAssets  = ref<Record<string, unknown>[]>([])
-const escoLoading = ref(true)
-const escoConfirmed = computed(() => escoAssets.value.filter((a: Record<string,unknown>) => a.ots_status === 'confirmed').length)
+// ── 브랜드 쇼케이스 (동적) ─────────────────────────────────
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const showcaseBrands  = ref<any[]>([])
+const showcaseLoading = ref(true)
 
-const featuredAsset = computed(() => escoAssets.value.find((a: Record<string,unknown>) => !!a.vc_id) ?? null)
+const featuredAsset = computed(() => {
+  const first = showcaseBrands.value[0]?.assets?.[0]
+  return first ?? null
+})
 
-async function loadEsco() {
+function brandIcon(slug: string) {
+  const icons: Record<string, string> = { esco: '🧴', seohwabi: '✨', tatsiana: '👗', mncv2002: '💄' }
+  return icons[slug] ?? '🏷️'
+}
+
+const BRAND_NAMES: Record<string, string> = {
+  esco: 'ESCO Cosmetics', seohwabi: '서화비', tatsiana: 'Tatsiana', mncv2002: 'MNCV'
+}
+
+function brandDisplayName(brand: { slug: string; brand_name: string }) {
+  if (BRAND_NAMES[brand.slug]) return BRAND_NAMES[brand.slug]
+  if (!brand.brand_name || brand.brand_name === brand.slug) {
+    return brand.slug.charAt(0).toUpperCase() + brand.slug.slice(1)
+  }
+  return brand.brand_name
+}
+
+async function loadShowcase() {
+  showcaseLoading.value = true
   try {
-    const { data } = await getBrandAssets('esco', 20)
-    escoAssets.value = data.assets ?? []
-  } catch {}
-  finally { escoLoading.value = false }
+    const { data } = await getBrandShowcase(6)
+    showcaseBrands.value = data.brands ?? []
+  } catch (e) { console.warn('[showcase]', e) }
+  finally { showcaseLoading.value = false }
 }
 
 // ── 라이브 피드 ───────────────────────────────────────────
@@ -747,7 +769,7 @@ function isVideo(url?: string, cls?: string): boolean {
 }
 
 onMounted(() => {
-  loadEsco()
+  loadShowcase()
   loadFeed()
   feedTimer = setInterval(() => {
     if (feedFilter.value === '' && feedOffset.value === 0) loadFeed()
