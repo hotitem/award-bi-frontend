@@ -74,8 +74,9 @@
                 <span class="absolute top-2 left-2 badge badge-gold text-[9px]">🎬 VIDEO</span>
               </template>
               <!-- 이미지 -->
-              <template v-else-if="asset.source_url">
-                <img :src="asset.source_url" :alt="asset.asset_metadata?.title ?? ''"
+              <template v-else-if="asset.asset_metadata?.image_url || asset.source_url">
+                <img :src="(asset.asset_metadata?.image_url || asset.source_url) as string"
+                     :alt="asset.asset_metadata?.title ?? ''"
                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                      @error="(e) => (e.target as HTMLImageElement).style.display='none'" />
               </template>

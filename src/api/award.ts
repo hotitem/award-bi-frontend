@@ -63,9 +63,10 @@ export const resolveShortUrl = (code: string)                        => award.ge
 export const createShortUrl  = (target: string)                      => award.post('/s', { target })
 
 // ── Declarations (Atelier) ────────────────────
-export const getDeclarations = (status?: string)                     => award.get('/declarations', { params: { status } })
-export const approveDecl     = (id: string)                          => award.post(`/declarations/${id}/approve`)
-export const rejectDecl      = (id: string, reason: string)         => award.post(`/declarations/${id}/reject`, { reason })
+export const getDeclarations  = (status?: string, category?: string) => award.get('/declarations', { params: { status: status || undefined, category: category || undefined } })
+export const approveDecl      = (id: string)                         => award.post(`/declarations/${id}/approve`)
+export const rejectDecl       = (id: string, reason: string)         => award.post(`/declarations/${id}/reject`, { reason })
+export const patchDeclCategory= (id: string, asset_class: string)    => award.patch(`/declarations/${id}/category`, { asset_class })
 
 // ── Admin ─────────────────────────────────────
 export const adminStats      = ()                                    => award.get('/admin/stats')
